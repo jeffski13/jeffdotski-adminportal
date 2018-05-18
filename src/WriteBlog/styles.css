@@ -1,11 +1,19 @@
 .loadingBar{
 }
 
-.addSectionButtonsContainer{
+.addSectionButtonsContainer {
     padding-bottom: 20px; 
 }
 
-.WriteBlog{
+.WriteBlog {
     padding-top: 25px;
     padding-bottom: 25px; 
+}
+
+.WriteBlog__file_details {
+    display: flex;
+}
+
+.WriteBlog__file_size {
+
 }

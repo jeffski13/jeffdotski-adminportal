@@ -36,6 +36,7 @@ class BlogList extends React.Component {
                 <div>Location: {blogPostBody.location}</div>
                 <div>Date: {moment.unix(blogPostBody.date).format("MM/DD/YYYY")}</div>
                 {blogPostBody.blogContent.map(this.renderBlogtextItem)}
+                <img src={blogPostBody.titleImage} height="300px" />
             </div>
         );
     }

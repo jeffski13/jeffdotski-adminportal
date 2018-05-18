@@ -38,10 +38,10 @@ class WriteBlog extends Component {
 		let s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 		this.state = {
-			trip: 'TestAdminski',
-			location: 'Nerdvana',
+			trip: 'Florida-2018-May',
+			location: '',
 			date: moment().startOf('day'),
-			title: 'Working on json',
+			title: '',
 			titleImage: {},
 			blogtext: [],
 			photoStatus: null,
@@ -72,6 +72,7 @@ class WriteBlog extends Component {
 	}
 
 	handleImgFileChange = (e) => {
+		console.log('image for title: ', e.target.files[0]);
 		this.setState({ titleImage: e.target.files[0] });
 	}
 
@@ -140,7 +141,17 @@ class WriteBlog extends Component {
 		return false;
 	}
 
+	getTitleImageSize = () => {
+		if(this.state.titleImage.size){
+			let finalStr = this.state.titleImage.size;
+			finalStr = finalStr / 1000;
+			return ' ' + finalStr + ' kB'
+		}
+	}
+
 	render() {
+
+
 
 		return (
 			<div className="WriteBlog">
@@ -192,16 +203,22 @@ class WriteBlog extends Component {
 						/>
 						<FormControl.Feedback />
 					</FormGroup>
+
 					<FormGroup
 						controlId="imageSelectForm"
 						validationState={validateFormString(this.state.titleImage.name)}
-					>
+						>
 						<ControlLabel>Title Image</ControlLabel>
-						<FormControl
-							type="file"
-							placeholder="Choose Image File"
-							onChange={this.handleImgFileChange}
-						/>
+						<div className="WriteBlog__file_details" >
+							<FormControl
+								type="file"
+								placeholder="Choose Image File"
+								onChange={this.handleImgFileChange}
+								/>
+							<strong className="WriteBlog__file_size" >
+								{this.getTitleImageSize()}
+							</strong>
+						</div>
 					</FormGroup>
 				</form>
 

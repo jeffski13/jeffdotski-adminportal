@@ -48,7 +48,7 @@ class BlogTextItem extends Component {
             <Col sm={5} smOffset={1} >
               <em>"{this.props.blogTextData.list.textItems[0].text}"</em>
             </Col>
-            { this.props.blogTextData.list.textItems[0].subText && <Col sm={8} smOffset={2} >
+            { this.props.blogTextData.list.textItems[0].subtext && <Col sm={8} smOffset={2} >
               ~{this.props.blogTextData.list.textItems[0].subtext}
             </Col>}
           </div>
