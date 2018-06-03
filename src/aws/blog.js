@@ -31,8 +31,7 @@ export function uploadBlog(blogData, callback){
 export function getBlogs(tripName, callback){
     axios({
         method: 'get',
-        url: `https://ctbw9plo6d.execute-api.us-east-2.amazonaws.com/Prod/blogs?tripName=${tripName}`,
-        headers: { 'x-api-key': awsApiKey }
+        url: `https://ctbw9plo6d.execute-api.us-east-2.amazonaws.com/Prod/blogs?tripName=${tripName}`
     })
     .then((response) => {
         //parse the response

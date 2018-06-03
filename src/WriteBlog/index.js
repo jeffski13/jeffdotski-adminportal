@@ -8,7 +8,7 @@ import moment from 'moment';
 import { validateFormString, validateDate, FORM_SUCCESS } from '../formvalidation';
 import BlogEntryFormGenerator from './BlogEntryFormGenerator';
 import AWS from 'aws-sdk';
-import { AWS_S3_REGION, AWS_IDENTITY_POOL_ID } from '../configski';
+import { AWS_S3_REGION, AWS_IDENTITY_POOL_ID_AWS_ACCESS } from '../configski';
 import { uploadPhoto } from '../aws/photo';
 import { uploadBlog } from '../aws/blog';
 import './styles.css';
@@ -32,16 +32,16 @@ class WriteBlog extends Component {
 		AWS.config.update({
 			region: AWS_S3_REGION,
 			credentials: new AWS.CognitoIdentityCredentials({
-				IdentityPoolId: AWS_IDENTITY_POOL_ID
+				IdentityPoolId: AWS_IDENTITY_POOL_ID_AWS_ACCESS
 			})
 		});
 		let s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 		this.state = {
-			trip: 'Florida-2018-May',
-			location: '',
+			trip: 'TesteesTrip',
+			location: 'TestCity',
 			date: moment().startOf('day'),
-			title: '',
+			title: 'Testees',
 			titleImage: {},
 			blogtext: [],
 			photoStatus: null,
@@ -92,7 +92,11 @@ class WriteBlog extends Component {
 			////////////////////////////////
 			//error handling
 			if (err) {
-				this.setState({ photoStatus: STATUS_FAILURE });
+				this.setState({ 
+					photoStatus: STATUS_FAILURE,
+					blogStatus: null
+				});
+				console.log('photo failture from admin page')
 				return;
 			}
 			this.setState({photoStatus: STATUS_SUCCESS});
@@ -112,7 +116,11 @@ class WriteBlog extends Component {
 				//upload blog call complete
 				////////////////////////////////
 				if(err){
-					this.setState({ blogStatus: STATUS_FAILURE });
+					this.setState({ 
+						blogStatus: STATUS_FAILURE,
+						photoStatus: null 
+					});
+					return;
 				}
 				this.setState({ blogStatus: STATUS_SUCCESS });
 			});

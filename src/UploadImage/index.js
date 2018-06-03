@@ -5,7 +5,7 @@ import CircularProgress from 'material-ui/Progress/CircularProgress';
 
 import Indicator from '../aws/Indicator';
 import { uploadPhoto, fetchBlogObjects } from '../aws/photo';
-import { AWS_S3_REGION, AWS_IDENTITY_POOL_ID } from '../configski';
+import { AWS_S3_REGION, AWS_IDENTITY_POOL_ID_AWS_ACCESS } from '../configski';
 //constants for AWS S3 SDK
 
 const STATUS_LOADING = 'STATUS_LOADING';
@@ -21,7 +21,7 @@ class UploadImage extends React.Component {
         AWS.config.update({
             region: AWS_S3_REGION,
             credentials: new AWS.CognitoIdentityCredentials({
-                IdentityPoolId: AWS_IDENTITY_POOL_ID
+                IdentityPoolId: AWS_IDENTITY_POOL_ID_AWS_ACCESS
             })
         });
         let s3 = new AWS.S3({ apiVersion: '2006-03-01' });
@@ -53,10 +53,12 @@ class UploadImage extends React.Component {
 
         fetchBlogObjects(this.state.awsS3, (err, allBlogS3Ojectes) => {
             if (err) {
+                console.log('jeffski upload photos err on fetch', err);
                 this.setState({ 
                     statusMessage: 'Error',
                     status: STATUS_FAILURE 
                 });
+                return;
             }
             //we got data!
             this.setState({
@@ -168,7 +170,7 @@ class UploadImage extends React.Component {
                 </ButtonToolbar>
                 <div>Status: {this.state.statusMessage}</div>
                 {
-                    this.state.blogDirectories.length > 0
+                    this.state.blogDirectories && this.state.blogDirectories.length > 0
                         ?
                         <div>
                             <h4>Blog Directory List</h4>
