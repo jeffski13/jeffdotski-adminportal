@@ -1,0 +1,12 @@
+.image-carousel__preview-image {
+    padding: 10px 5px 10px 5px;
+}
+
+.image-carousel__preview-image-individual {
+    height: 200px;
+}
+
+.image-carousel__preview-images-section {
+    display: -webkit-flex; /* Safari */
+    display: flex;
+}
