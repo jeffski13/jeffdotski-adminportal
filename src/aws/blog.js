@@ -1,4 +1,4 @@
-import {awsApiKey} from '../configski';
+import {AWS_API_KEY_AWS_ACCESS, AWS_API_KEY_READONLY} from '../configski';
 import axios from 'axios';
 
 /**
@@ -10,8 +10,8 @@ import axios from 'axios';
 export function uploadBlog(blogData, callback){
     axios({
         method: 'post',
-        url: `https://ctbw9plo6d.execute-api.us-east-2.amazonaws.com/Prod/blogs`,
-        headers: { 'x-api-key': awsApiKey },
+        url: `https://ctbw9plo6d.execute-api.us-east-2.amazonaws.com/Prod/blogs_read`,
+        headers: { 'x-api-key': AWS_API_KEY_AWS_ACCESS },
         data: blogData
     })
     .then((response) => {
@@ -31,7 +31,8 @@ export function uploadBlog(blogData, callback){
 export function getBlogs(tripName, callback){
     axios({
         method: 'get',
-        url: `https://ctbw9plo6d.execute-api.us-east-2.amazonaws.com/Prod/blogs?tripName=${tripName}`
+        url: `https://864wf8s3oi.execute-api.us-east-2.amazonaws.com/Prod/blogs_read?tripName=${tripName}`,
+        headers: { 'x-api-key': AWS_API_KEY_READONLY }
     })
     .then((response) => {
         //parse the response

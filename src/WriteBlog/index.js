@@ -38,10 +38,10 @@ class WriteBlog extends Component {
 		let s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 		this.state = {
-			trip: 'TesteesTrip',
+			trip: 'TestTrip6_4_18',
 			location: 'TestCity',
 			date: moment().startOf('day'),
-			title: 'Testees',
+			title: 'TestLoco',
 			titleImage: {},
 			blogtext: [],
 			photoStatus: null,
@@ -77,7 +77,7 @@ class WriteBlog extends Component {
 	}
 
 	//upload photo/blog to server
-	onSendClicked = () => {
+	onUploadBlogClicked = () => {
 		//set state to loading so user cant submit blog twice
 		// and loading indicator appears
 		this.setState({
@@ -92,7 +92,7 @@ class WriteBlog extends Component {
 			////////////////////////////////
 			//error handling
 			if (err) {
-				this.setState({ 
+				this.setState({
 					photoStatus: STATUS_FAILURE,
 					blogStatus: null
 				});
@@ -122,7 +122,9 @@ class WriteBlog extends Component {
 					});
 					return;
 				}
-				this.setState({ blogStatus: STATUS_SUCCESS });
+				this.setState({ blogStatus: STATUS_SUCCESS }, ()=>{
+					console.log('jeffski state after upload: ', this.state);
+				});
 			});
 		});
 	}
@@ -158,9 +160,6 @@ class WriteBlog extends Component {
 	}
 
 	render() {
-
-
-
 		return (
 			<div className="WriteBlog">
 				{/* minimum information required for blog (trip, title, date, location) */}
@@ -240,10 +239,10 @@ class WriteBlog extends Component {
 					<Button
 						bsStyle="primary"
 						bsSize="large"
-						onClick={this.onSendClicked}
+						onClick={this.onUploadBlogClicked}
 						disabled={!this.isFormSubmitAllowed()}
 					>
-						Send button
+						Upload Blog
           			</Button>
 					<div>
 						{(this.state.blogStatus === STATUS_LOADING || this.state.photoStatus === STATUS_LOADING)
