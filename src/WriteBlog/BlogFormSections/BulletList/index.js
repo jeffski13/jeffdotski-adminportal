@@ -18,7 +18,7 @@ class BulletList extends Component {
 
 		//initial state with one bulletlist item
 		this.state = {
-			headertext: null,
+			headertext: undefined,
 			bulletListItems: [
 				{
                     bulletData: null,
@@ -30,7 +30,7 @@ class BulletList extends Component {
 
 	handleTextChange = (e) => {
 		if (e.target.value === '') {
-			this.setState({ headertext: null });
+			this.setState({ headertext: undefined });
 		}
 		else {
 			this.setState({ headertext: e.target.value });

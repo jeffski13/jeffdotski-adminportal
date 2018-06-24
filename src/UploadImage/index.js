@@ -78,6 +78,7 @@ class UploadImage extends React.Component {
             status: STATUS_LOADING
         });
 
+        //iterate through all the photo files and upload them
         for (let i = 0; i < this.state.imgFile.length; i++) {
             //does file exist?
             if (this.doesFileExist(this.state.imgFile[i], 'Disney2018')) {

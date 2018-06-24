@@ -9,4 +9,14 @@
 .image-carousel__preview-images-section {
     display: -webkit-flex; /* Safari */
     display: flex;
+    overflow: scroll;
+}
+
+.image-carousel__preview-image-details {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.image-carousel__preview-image-file-name {
+    padding-bottom: 5px;
 }

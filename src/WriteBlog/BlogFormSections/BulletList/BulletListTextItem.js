@@ -15,15 +15,15 @@ class BulletListTextItem extends Component {
 		super(props, context);
 
 		this.state = {
-			title: null,
-			text: null,
-			subtext: null
+			title: undefined,
+			text: undefined,
+			subtext: undefined
 		};
 	}
 
 	handleTitleChange = (e) => {
 		if (e.target.value === '') {
-			this.setState({ title: null });
+			this.setState({ title: undefined });
 		}
 		else {
 			this.setState({ title: e.target.value });
@@ -32,7 +32,7 @@ class BulletListTextItem extends Component {
 
 	handleTextChange = (e) => {
 		if (e.target.value === '') {
-			this.setState({ text: null });
+			this.setState({ text: undefined });
 		}
 		else {
 			this.setState({ text: e.target.value });
@@ -41,7 +41,7 @@ class BulletListTextItem extends Component {
 
 	handleSubtextChange = (e) => {
 		if (e.target.value === '') {
-			this.setState({ subtext: null });
+			this.setState({ subtext: undefined });
 		}
 		else {
 			this.setState({ subtext: e.target.value });

@@ -40,7 +40,7 @@ class BlogEntryText extends React.Component {
 
         this.props.formDataCallback(blogTextArrModel);
     }
-
+    
     //returns an array of objects with a "text" field. 
     rawBlogToBlogTextModel(blogArr){
         let finalArr = [];
