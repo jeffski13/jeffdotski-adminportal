@@ -1,19 +1,13 @@
 import React from 'react';
 import moment from 'moment';
 
+import BlogImages from './BlogImages';
 import BlogTextItem from './BlogTextItem';
 import './styles.css';
 
 class BlogList extends React.Component {
 
-    constructor(props) {
-        super(props);
-
-        this.renderBlog = this.renderBlog.bind(this);
-        this.renderBlogtextItem = this.renderBlogtextItem.bind(this);
-    }
-
-    renderBlogtextItem(blogPostBody) {
+    renderBlogtextItem = (blogPostBody) => {
         return (
             <BlogTextItem
                 blogTextData={blogPostBody}
@@ -23,40 +17,47 @@ class BlogList extends React.Component {
 
     //render each blog here
     // show Title, Location, Date, and 
-    renderBlog(blogItem, index) {
-        let blogPostBody = blogItem;
+    renderBlogItem = (blogItem, index) => {
 
-        if (!blogPostBody) {
+        console.log('jeffski BlogList > renderblogitem() > blogItem: ', blogItem)
+
+        if (!blogItem) {
             return null;
         }
 
         return (
             <div className="blog" key={index}>
-                <div>Title: {blogPostBody.title}</div>
-                <div>Location: {blogPostBody.location}</div>
-                <div>Date: {moment.unix(blogPostBody.date).format("MM/DD/YYYY")}</div>
-                {blogPostBody.blogContent.map(this.renderBlogtextItem)}
-                <img src={blogPostBody.titleImage} height="300px" />
+                <div>Title: {blogItem.title}</div>
+                <div>Location: {blogItem.location}</div>
+                <div>Date: {moment.unix(blogItem.date).format("MM/DD/YYYY")}</div>
+                {blogItem.blogContent.map(this.renderBlogtextItem)}
+                <img src={blogItem.titleImage} height="300px" />
+                <BlogImages blogImageData={blogItem.blogImages} />
             </div>
         );
+    }
+
+    sortBlogsByDate = (a,b) => {
+        if (a.date < b.date){
+            return 1;
+        }
+        if (a.date > b.date){
+            return -1;
+        }
+        return 0;
     }
 
     render(){
         //order blogs by date
         let blogsArr = [...this.props.blogsArr];
-        blogsArr.sort((a,b)=>{
-            if (a.date < b.date){
-                return 1;
-            }
-            if (a.date > b.date){
-                return -1;
-            }
-            return 0;
-        });
-        
+        if(!blogsArr){
+            return null;
+        }
+
+        blogsArr.sort(this.sortBlogsByDate);
         return (
-            <div>
-                {blogsArr.map(this.renderBlog)}
+            <div className="BlogList">
+                {blogsArr.map(this.renderBlogItem)}
             </div>
         );
     }

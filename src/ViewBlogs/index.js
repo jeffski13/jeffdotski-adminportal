@@ -82,10 +82,7 @@ class ViewBlogs extends Component {
 							&& <Indicator success={false} />}
 					</div>
 				</ButtonToolbar>
-
-				<div>
-					<BlogList blogsArr={this.state.blogData} />
-				</div>
+				<BlogList blogsArr={this.state.blogData} />
 			</div>
 		);
 	}
