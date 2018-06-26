@@ -1,16 +1,39 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Carousel} from 'react-bootstrap';
 
+import { Image } from 'react-bootstrap';
 import BlogImageItem from './BlogImageItem';
-import Cookie from './cookie.jpg';
+import './styles.css';
+
+import Carousel from 'react-image-carousel';
 
 class BlogImages extends React.Component {
-    
+
+    constructor() {
+        super();
+        this.state = {
+            width: window.innerWidth,
+        };
+    }
+
+    componentWillMount() {
+        window.addEventListener('resize', this.handleWindowSizeChange);
+    }
+
+    // make sure to remove the listener
+    // when the component is not mounted anymore
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.handleWindowSizeChange);
+    }
+
+    handleWindowSizeChange = () => {
+        this.setState({ width: window.innerWidth });
+    };
+
     renderBlogImageItems = (blogImageItemData, index) => {
         console.log('jeffski rendering blog images Item: ', blogImageItemData);
 
-        return(
+        return (
             <BlogImageItem
                 key={blogImageItemData.url + index}
                 title={blogImageItemData.imageTitle}
@@ -20,29 +43,45 @@ class BlogImages extends React.Component {
         );
     }
 
-    render(){
+    renderSmallScreenImages(imageUrl) {
+        return (<Image src={imageUrl} responsive />);
+    }
+
+    render() {
+
         //make sure blog images exist
-        if(!this.props.blogImageData){
+        if (!this.props.blogImageData) {
             return null;
         }
 
-        console.log('jeffski rendering blog images: ', this.props.blogImageData);
+        let images = [];
+        this.props.blogImageData.forEach(element => {
+            images.push(element.url);
+        });
 
-        return (
-            <div>
-                BlogImages
-                <Carousel>
-                    <Carousel.Item>
-                        <img width={900} height={500} alt="900x500" src={Cookie} />
-                        <Carousel.Caption>
-                        <h3>First slide label</h3>
-                        <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
-                        </Carousel.Caption>
-                    </Carousel.Item>
-                    {this.props.blogImageData.map(this.renderBlogImageItems)}
-                </Carousel>
-            </div>
-        );
+        const { width } = this.state;
+        const isMobile = width <= 650;
+
+        if (isMobile) {
+            console.log(images);
+            return (
+                <div className="BlogImages__ResponsiveImages">
+                    {images.map(this.renderSmallScreenImages)}
+                </div>
+            );
+        }
+        else {
+            return (
+                <div className="BlogImages__Carousel">
+                    <Carousel
+                        images={images}
+                        thumb={true}
+                        loop={false}
+                        autoplay={20000} />
+                </div>
+            );
+        }
+
     }
 }
 
