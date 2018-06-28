@@ -6,6 +6,8 @@ import BlogImageItem from './BlogImageItem';
 import './styles.css';
 
 import Carousel from 'react-image-carousel';
+import CarouselNuka from 'nuka-carousel';
+import './carousel-styles.css';
 
 class BlogImages extends React.Component {
 
@@ -46,11 +48,15 @@ class BlogImages extends React.Component {
     renderSmallScreenImages(imageUrl) {
         return (<Image src={imageUrl} responsive />);
     }
+    
+    renderNukaImg(imageUrl) {
+        return (<img src={imageUrl} className="BlogImages__NukaImage" />);
+    }
 
     render() {
 
         //make sure blog images exist
-        if (!this.props.blogImageData) {
+        if (!this.props.blogImageData || this.props.blogImageData.length === 0) {
             return null;
         }
 

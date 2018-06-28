@@ -47,7 +47,9 @@ class WriteBlog extends Component {
 			titleImage: {},
 			titleImageUrl: null,
 			blogtext: [],
-			blogImages: [],
+			blogImages: {
+				imgFiles: []
+			},
 			blogImagesUrls: [],
 			blogImagesStatusArr: [],
 			photoStatus: null, //status for both blog photos and title photo
@@ -87,13 +89,16 @@ class WriteBlog extends Component {
 		//initialize variables for loading progress
 		let initializedBlogImagesUploadStatusArr = [];
 		let initializedBlogImageUrls = [];
-		for(let i =0; i < this.state.blogImages.imgFiles.length; i++){
-			initializedBlogImagesUploadStatusArr.push(STATUS_LOADING);
-			initializedBlogImageUrls.push({
-				url: '',
-				imageTitle: '',
-				imageDescription: ''
-			});
+
+		if(this.state.blogImages.imgFiles !== undefined){
+			for(let i =0; i < this.state.blogImages.imgFiles.length; i++){
+				initializedBlogImagesUploadStatusArr.push(STATUS_LOADING);
+				initializedBlogImageUrls.push({
+					url: '',
+					imageTitle: '',
+					imageDescription: ''
+				});
+			}
 		}
 		
 		//set state to loading so user cant submit blog twice
