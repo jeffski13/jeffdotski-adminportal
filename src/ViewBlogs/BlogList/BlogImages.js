@@ -55,18 +55,21 @@ class BlogImages extends React.Component {
 
     render() {
 
-        //make sure blog images exist
+        //make sure blog images exist. If not, dont render a darn thing
         if (!this.props.blogImageData || this.props.blogImageData.length === 0) {
             return null;
         }
 
         let images = [];
-        this.props.blogImageData.forEach(element => {
-            images.push(element.url);
+        this.props.blogImageData.forEach(nextBlogImageData => {
+            images.push(nextBlogImageData.url);
         });
 
-        const { width } = this.state;
-        const isMobile = width <= 650;
+        //is it time to go mobile?
+        let isMobile = false;
+        if(this.state.width <= 650){
+            isMobile = true;
+        }
 
         if (isMobile) {
             console.log(images);
