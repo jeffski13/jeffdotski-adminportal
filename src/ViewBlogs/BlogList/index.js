@@ -19,14 +19,12 @@ class BlogList extends React.Component {
     // show Title, Location, Date, and 
     renderBlogItem = (blogItem, index) => {
 
-        console.log('jeffski BlogList > renderblogitem() > blogItem: ', blogItem)
-
         if (!blogItem) {
             return null;
         }
 
         return (
-            <div className="blog" key={index}>
+            <div className="blog" key={blogItem.date}>
                 <div>Title: {blogItem.title}</div>
                 <div>Location: {blogItem.location}</div>
                 <div>Date: {moment.unix(blogItem.date).format("MM/DD/YYYY")}</div>
