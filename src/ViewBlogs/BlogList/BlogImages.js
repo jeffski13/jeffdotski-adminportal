@@ -1,13 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Modal } from 'react-bootstrap';
 
-import { Image } from 'react-bootstrap';
 import BlogImageItem from './BlogImageItem';
 import './styles.css';
-
-import Carousel from 'react-image-carousel';
-import CarouselNuka from 'nuka-carousel';
-import './carousel-styles.css';
+import './react-image-carousel.css';
+import ReactImageCarousel from './ReactImageCarousel';
 
 class BlogImages extends React.Component {
 
@@ -15,14 +13,17 @@ class BlogImages extends React.Component {
         super();
         this.state = {
             width: window.innerWidth,
+            isImageFullScreen: false,
+            imageFullScreenUrl: ''
         };
     }
 
+    // add a listener for the screen size since we have a mobile view
     componentWillMount() {
         window.addEventListener('resize', this.handleWindowSizeChange);
     }
 
-    // make sure to remove the listener
+    // make sure to remove the listener for the screen size
     // when the component is not mounted anymore
     componentWillUnmount() {
         window.removeEventListener('resize', this.handleWindowSizeChange);
@@ -30,6 +31,17 @@ class BlogImages extends React.Component {
 
     handleWindowSizeChange = () => {
         this.setState({ width: window.innerWidth });
+    };
+
+    onImageFullScreenClose = () => {
+        this.setState({ isImageFullScreen: false });
+    };
+
+    showImageFullScreen = (imageUrl) => {
+        this.setState({ 
+            isImageFullScreen: true,
+            imageFullScreenUrl: imageUrl
+        });
     };
 
     renderBlogImageItems = (blogImageItemData, index) => {
@@ -45,12 +57,20 @@ class BlogImages extends React.Component {
         );
     }
 
-    renderSmallScreenImages(imageUrl) {
-        return (<Image src={imageUrl} responsive />);
-    }
-    
-    renderNukaImg(imageUrl) {
-        return (<img src={imageUrl} className="BlogImages__NukaImage" />);
+    renderDesktopGallery = (nextImageItem) => {
+        return (
+            <div className="img-container-background">
+                <div className="img-container">
+                    <img
+                        src={nextImageItem.url}
+                        className="img-responsive img-clickable"
+                        onClick={()=>{
+                            this.showImageFullScreen(nextImageItem.url)
+                        }}
+                    />
+                </div>
+            </div>
+        );
     }
 
     render() {
@@ -60,18 +80,41 @@ class BlogImages extends React.Component {
             console.log('jeffski rendering blogimage: no images > Null');
             return null;
         }
-        
+
         let images = [];
         this.props.blogImageData.forEach(nextBlogImageData => {
             images.push(nextBlogImageData.url);
         });
-        
+
         //is it time to go mobile?
         let isMobile = false;
-        if(this.state.width <= 650){
+        if (this.state.width <= 650) {
             isMobile = true;
         }
-        
+
+        images = [
+            {
+                url: "http://i.imgur.com/37w80TG.jpg",
+                imageTitle: "title",
+                imageDescription: "descski"
+            },
+            {
+                url: "http://i.imgur.com/tI5jq2c.jpg",
+                imageTitle: "title",
+                imageDescription: "descski"
+            },
+            {
+                url: "http://i.imgur.com/B1MCOtx.jpg",
+                imageTitle: "title",
+                imageDescription: "descski"
+            },
+            {
+                url: "http://i.imgur.com/37w80TG.jpg",
+                imageTitle: "title",
+                imageDescription: "descski"
+            }
+        ]
+
         if (isMobile) {
             console.log('jeffski rendering mobile images');
             return (
@@ -80,20 +123,32 @@ class BlogImages extends React.Component {
                 </div>
             );
         }
-        else {
-            console.log('jeffski rendering nuka carousel');
+        else if(false) { //not at all mobile
             return (
-                <CarouselNuka>
-                    <img src="http://placehold.it/1000x400/ffffff/c0392b/&text=slide1" />
-                    <img src="http://placehold.it/1000x400/ffffff/c0392b/&text=slide2" />
-                    <img src="http://placehold.it/1000x400/ffffff/c0392b/&text=slide3" />
-                    <img src="http://placehold.it/1000x400/ffffff/c0392b/&text=slide4" />
-                    <img src="http://placehold.it/1000x400/ffffff/c0392b/&text=slide5" />
-                    <img src="http://placehold.it/1000x400/ffffff/c0392b/&text=slide6" />
-                </CarouselNuka>
+                <React.Fragment>
+                    <div className="clearfloatfix"></div>
+                    <div className="blogimages-row-container" >
+                        {images.map(this.renderDesktopGallery)}
+                    </div>
+
+                    <Modal show={this.state.isImageFullScreen} onHide={this.onImageFullScreenClose}>
+                        <span className="blogimage-full-screen-helper-css-span" />
+                        <img src={this.state.imageFullScreenUrl} class="img-responsive center-block blogimage-full-screen" />
+                    </Modal>
+                </React.Fragment>
             );
         }
-        
+        else {
+            return(
+                <React.Fragment>
+
+                    <div className="spacer-carousel">
+                    </div>
+                    <ReactImageCarousel images={images} />
+                </React.Fragment>
+            )
+        }
+
     }
 }
 

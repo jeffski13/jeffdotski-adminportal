@@ -118,3 +118,7 @@ element.style {
     margin: 5px;
     cursor: pointer;
 }
+
+.slider-list {
+    min-height: 500px; 
+}

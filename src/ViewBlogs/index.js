@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FormGroup, ControlLabel, FormControl, ButtonToolbar, Button } from 'react-bootstrap';
+import { FormGroup, ControlLabel, FormControl, ButtonToolbar, Button, Modal, Image } from 'react-bootstrap';
 import 'react-datepicker/dist/react-datepicker.css';
 import CircularProgress from 'material-ui/Progress/CircularProgress';
 
@@ -7,6 +7,8 @@ import { validateFormString } from '../formvalidation';
 import { getBlogs } from '../aws/blog';
 import BlogList from './BlogList';
 import Indicator from '../aws/Indicator';
+
+import './carousel-styles.css';
 
 const STATUS_LOADING = 'STATUS_LOADING';
 const STATUS_FAILURE = 'STATUS_FAILURE';
@@ -39,16 +41,16 @@ class ViewBlogs extends Component {
 				this.setState({ status: STATUS_FAILURE });
 				return;
 			}
-			this.setState({ 
+			this.setState({
 				blogData: data,
-				status: STATUS_SUCCESS 
+				status: STATUS_SUCCESS
 			});
 		});
 	}
 
 	render() {
 		return (
-			<div>
+			<React.Fragment>
 				<form>
 					<FormGroup
 						controlId="formBasicText"
@@ -65,9 +67,9 @@ class ViewBlogs extends Component {
 					</FormGroup>
 				</form>
 				<ButtonToolbar>
-					<Button 
-						bsStyle="primary" 
-						bsSize="large" 
+					<Button
+						bsStyle="primary"
+						bsSize="large"
 						onClick={this.onGetBlogsButtonClicked}
 						disabled={this.state.status === STATUS_LOADING}
 					>
@@ -83,7 +85,7 @@ class ViewBlogs extends Component {
 					</div>
 				</ButtonToolbar>
 				<BlogList blogsArr={this.state.blogData} />
-			</div>
+			</React.Fragment>
 		);
 	}
 }
