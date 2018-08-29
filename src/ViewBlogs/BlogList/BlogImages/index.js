@@ -1,20 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal } from 'react-bootstrap';
 
-import BlogImageItem from './BlogImageItem';
-import './styles.css';
-import './react-image-carousel.css';
 import ReactImageCarousel from './ReactImageCarousel';
+import {Image} from 'react-bootstrap';
+
+import "./blog-image-styles.css";
 
 class BlogImages extends React.Component {
 
     constructor() {
         super();
         this.state = {
-            width: window.innerWidth,
-            isImageFullScreen: false,
-            imageFullScreenUrl: ''
+            width: window.innerWidth
         };
     }
 
@@ -33,46 +30,22 @@ class BlogImages extends React.Component {
         this.setState({ width: window.innerWidth });
     };
 
-    onImageFullScreenClose = () => {
-        this.setState({ isImageFullScreen: false });
-    };
-
-    showImageFullScreen = (imageUrl) => {
-        this.setState({ 
-            isImageFullScreen: true,
-            imageFullScreenUrl: imageUrl
-        });
-    };
-
     renderBlogImageItems = (blogImageItemData, index) => {
-        console.log('jeffski rendering blog images Item: ', blogImageItemData);
+        console.log('jeffski rendering mobile blog images Item: ', blogImageItemData);
 
         return (
-            <BlogImageItem
-                key={blogImageItemData.url + index}
-                title={blogImageItemData.imageTitle}
-                description={blogImageItemData.imageDescription}
-                imageUrl={blogImageItemData.url}
-            />
-        );
-    }
-
-    renderDesktopGallery = (nextImageItem) => {
-        return (
-            <div className="img-container-background">
-                <div className="img-container">
-                    <img
-                        src={nextImageItem.url}
-                        className="img-responsive img-clickable"
-                        onClick={()=>{
-                            this.showImageFullScreen(nextImageItem.url)
-                        }}
+            <div className="BlogImages-mobile-responsive-images" >
+                <Image
+                    key={blogImageItemData.url + index}
+                    src={blogImageItemData.url}
+                    responsive 
                     />
-                </div>
+                <p>{blogImageItemData.imageTitle}</p>
+                <p>{blogImageItemData.imageDescription}</p>
             </div>
         );
     }
-
+    
     render() {
 
         //make sure blog images exist. If not, dont render a darn thing
@@ -118,35 +91,21 @@ class BlogImages extends React.Component {
         if (isMobile) {
             console.log('jeffski rendering mobile images');
             return (
-                <div className="BlogImages__ResponsiveImages">
-                    {images.map(this.renderSmallScreenImages)}
-                </div>
+                <React.Fragment>
+                    <div className="BlogImages-top-spacer" />
+                    <div >
+                        {images.map(this.renderBlogImageItems)}
+                    </div>
+                </React.Fragment>
             );
         }
-        else if(false) { //not at all mobile
+        else { //not at all mobile
             return (
                 <React.Fragment>
-                    <div className="clearfloatfix"></div>
-                    <div className="blogimages-row-container" >
-                        {images.map(this.renderDesktopGallery)}
-                    </div>
-
-                    <Modal show={this.state.isImageFullScreen} onHide={this.onImageFullScreenClose}>
-                        <span className="blogimage-full-screen-helper-css-span" />
-                        <img src={this.state.imageFullScreenUrl} class="img-responsive center-block blogimage-full-screen" />
-                    </Modal>
-                </React.Fragment>
-            );
-        }
-        else {
-            return(
-                <React.Fragment>
-
-                    <div className="spacer-carousel">
-                    </div>
+                    <div className="BlogImages-top-spacer" />
                     <ReactImageCarousel images={images} />
                 </React.Fragment>
-            )
+            );
         }
 
     }

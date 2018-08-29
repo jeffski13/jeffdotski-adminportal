@@ -16,7 +16,7 @@ class ReactImageCarousel extends React.Component {
         })
 
         return (
-            <div >
+            <div>
                 React Image Carousel
                 <ImageGallery items={imageUrls} />
             </div>

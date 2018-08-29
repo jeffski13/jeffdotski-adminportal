@@ -8,8 +8,6 @@ import { getBlogs } from '../aws/blog';
 import BlogList from './BlogList';
 import Indicator from '../aws/Indicator';
 
-import './carousel-styles.css';
-
 const STATUS_LOADING = 'STATUS_LOADING';
 const STATUS_FAILURE = 'STATUS_FAILURE';
 const STATUS_SUCCESS = 'STATUS_SUCCESS';

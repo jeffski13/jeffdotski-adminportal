@@ -10,16 +10,7 @@
     margin-top: 10px;
 }
 
-.BlogImages__ResponsiveImages {
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-}
 
-.BlogImages__ResponsiveImages img {
-    padding: 10px;
-    max-height: 400px;
-}
 
 .BlogImages__Carousel {
     width: 800px;
