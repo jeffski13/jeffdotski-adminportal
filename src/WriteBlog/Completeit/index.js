@@ -83,10 +83,15 @@ export default class Completeit extends Component {
     // User pressed the enter key, update the input and close the
     // suggestions
     if (e.keyCode === 13) {
+      const userInput = filteredSuggestions[activeSuggestion];
+      if (this.props.userInputChangedCallback) {
+        this.props.userInputChangedCallback(userInput);
+      }  
+
       this.setState({
         activeSuggestion: 0,
         showSuggestions: false,
-        userInput: filteredSuggestions[activeSuggestion]
+        userInput: userInput
       });
     }
     // User pressed the up arrow, decrement the index
