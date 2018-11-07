@@ -42,7 +42,7 @@ class ViewBlogs extends Component {
 			}
 			this.setState({
 				availableTrips: data,
-				status: STATUS_SUCCESS
+				status: null
 			});
 		});
 	}
@@ -96,7 +96,6 @@ class ViewBlogs extends Component {
 						title={tripDropdownValue}
 						id="trips-dropdown"
 						disabled={this.state.status === STATUS_LOADING}
-						bsStyle="ViewBlogs-trips-dropdown"
 					>
 						{this.state.availableTrips.map(this.renderTripOptions)}
 					</DropdownButton>

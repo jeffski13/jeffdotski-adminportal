@@ -12,8 +12,10 @@ import AWS from 'aws-sdk';
 import { AWS_S3_REGION, AWS_IDENTITY_POOL_ID_AWS_ACCESS } from '../configski';
 import { uploadPhoto } from '../aws/photo';
 import { uploadBlog } from '../aws/blog';
+import { getTrips } from '../aws/trips';
 import './styles.css';
 import Indicator from '../aws/Indicator';
+import Completeit from './Completeit';
 
 //statuses for all the things (blog images, title image, blog data) we will be uploading to the server
 const STATUS_SUCCESS = 'STATUS_SUCCESS';
@@ -54,10 +56,32 @@ class WriteBlog extends Component {
 			blogImagesStatusArr: [],
 			photoStatus: null, //status for both blog photos and title photo
 			blogStatus: null, //status for blog data
-			awsS3: s3
+			awsS3: s3,
+			availableTrips: []
 		};
 	}
-	
+
+	componentDidMount() {
+		//get a list of all the trips when app starts
+		this.setState({ status: STATUS_LOADING });
+		getTrips((err, data) => {
+			if (err) {
+				console.log(err);
+				this.setState({ status: STATUS_FAILURE });
+				return;
+			}
+			//transform trips into string array for auto suggest
+			let tripArr = [];
+			data.map((nextTrip) => {
+				tripArr.push(nextTrip.name);
+			});
+			this.setState({
+				availableTrips: tripArr,
+				status: null
+			});
+		});
+	}
+
 	//form data binding
 	handleDateChange = (date) => {
 		this.setState({ date: date });
@@ -303,17 +327,13 @@ class WriteBlog extends Component {
 				</div>
 				<form>
 					<FormGroup
-						controlId="tripFormInput"
+						controlId="WriteBlog-tripFormInput"
 						validationState={validateFormString(this.state.trip)}
 					>
 						<ControlLabel>Trip</ControlLabel>
-						<FormControl
-							type="text"
-							value={this.state.trip}
-							placeholder="Enter text"
-							onChange={this.handleTripChange}
+						<Completeit
+							suggestions={this.state.availableTrips}
 						/>
-						<FormControl.Feedback />
 					</FormGroup>
 					<FormGroup
 						controlId="locationFormInput"
