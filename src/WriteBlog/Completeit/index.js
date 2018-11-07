@@ -2,13 +2,17 @@ import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 import './styles.css';
 
+
+//credit where its due: https://alligator.io/react/react-autocomplete/
 export default class Completeit extends Component {
   static propTypes = {
-    suggestions: PropTypes.instanceOf(Array)
+    suggestions: PropTypes.instanceOf(Array),
+    userInputChangedCallback: PropTypes.func
   };
 
   static defaultProps = {
-    suggestions: []
+    suggestions: [],
+    userInputChangedCallback: null
   };
 
   constructor(props) {
@@ -30,14 +34,20 @@ export default class Completeit extends Component {
   onChange = e => {
     const { suggestions } = this.props;
     const userInput = e.currentTarget.value;
-    console.log('jeffski userinput', userInput);
+    
+    if (this.props.userInputChangedCallback) {
+      this.props.userInputChangedCallback(userInput);
+    }
     
     // Filter our suggestions that don't contain the user's input
     const filteredSuggestions = suggestions.filter( (suggestion) => {
-        console.log('jeffski suggestion', suggestion);
         return suggestion.toLowerCase().indexOf(userInput.toLowerCase()) > -1
       }
     );
+
+    if (this.props.userInputChangedCallback) {
+      this.props.userInputChangedCallback(userInput);
+    }
 
     // Update the user input and filtered suggestions, reset the active
     // suggestion and make sure the suggestions are shown
@@ -51,12 +61,18 @@ export default class Completeit extends Component {
 
   // Event fired when the user clicks on a suggestion
   onClick = e => {
+
+    const userInput = e.currentTarget.innerText;
+    if (this.props.userInputChangedCallback) {
+      this.props.userInputChangedCallback(userInput);
+    }
+
     // Update the user input and reset the rest of the state
     this.setState({
       activeSuggestion: 0,
       filteredSuggestions: [],
       showSuggestions: false,
-      userInput: e.currentTarget.innerText
+      userInput: userInput
     });
   };
 

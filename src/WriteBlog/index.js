@@ -42,7 +42,7 @@ class WriteBlog extends Component {
 		let s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 		this.state = {
-			trip: 'TestTrip6_4_18',
+			trip: '',
 			location: 'TestCity',
 			date: moment().startOf('day'),
 			title: 'TestLoco',
@@ -97,10 +97,6 @@ class WriteBlog extends Component {
 
 	handleLocationChange = (e) => {
 		this.setState({ location: e.target.value });
-	}
-
-	handleTripChange = (e) => {
-		this.setState({ trip: e.target.value });
 	}
 
 	handleImgFileChange = (e) => {
@@ -333,6 +329,11 @@ class WriteBlog extends Component {
 						<ControlLabel>Trip</ControlLabel>
 						<Completeit
 							suggestions={this.state.availableTrips}
+							userInputChangedCallback={(tripInput) => {
+								this.setState({
+									trip: tripInput
+								});
+							}}  
 						/>
 					</FormGroup>
 					<FormGroup
