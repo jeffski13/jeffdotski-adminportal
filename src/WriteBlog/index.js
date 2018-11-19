@@ -215,8 +215,9 @@ class WriteBlog extends Component {
 	
 	uploadBlog_blogData = () => {
 		//send request with new blog entry
+		// TEST TRIP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		let blogdata = {
-			trip: this.state.trip,
+			tripId: "uuid1234",
 			title: this.state.title,
 			location: this.state.location,
 			date: moment(this.state.date.valueOf()).unix(),

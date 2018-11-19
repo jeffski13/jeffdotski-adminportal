@@ -1,11 +1,17 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import BlogImages from './BlogImages';
 import BlogTextItem from './BlogTextItem';
 import './styles.css';
 
-class BlogList extends React.Component {
+export default class BlogList extends React.Component {
+
+    static propTypes = {
+        //all of the data for the blogs (images, text, etc.)
+        blogsArr: PropTypes.array.isRequired,
+    };
 
     renderBlogtextItem = (blogPostBody) => {
         return (
@@ -60,5 +66,3 @@ class BlogList extends React.Component {
         );
     }
 }
-
-export default BlogList;

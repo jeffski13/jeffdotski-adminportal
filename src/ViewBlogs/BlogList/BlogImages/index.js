@@ -7,6 +7,11 @@ import {Image} from 'react-bootstrap';
 import "./blog-image-styles.css";
 
 class BlogImages extends React.Component {
+    
+    static propTypes = {
+        //all of the image data for the blog
+        blogImageData: PropTypes.array.isRequired,
+    };
 
     constructor() {
         super();
@@ -59,34 +64,35 @@ class BlogImages extends React.Component {
             images.push(nextBlogImageData.url);
         });
 
+        console.log('jeffski images', images);
         //is it time to go mobile?
         let isMobile = false;
         if (this.state.width <= 650) {
             isMobile = true;
         }
 
-        images = [
-            {
-                url: "http://i.imgur.com/37w80TG.jpg",
-                imageTitle: "title",
-                imageDescription: "descski"
-            },
-            {
-                url: "http://i.imgur.com/tI5jq2c.jpg",
-                imageTitle: "title",
-                imageDescription: "descski"
-            },
-            {
-                url: "http://i.imgur.com/B1MCOtx.jpg",
-                imageTitle: "title",
-                imageDescription: "descski"
-            },
-            {
-                url: "http://i.imgur.com/37w80TG.jpg",
-                imageTitle: "title",
-                imageDescription: "descski"
-            }
-        ]
+        // images = [
+        //     {
+        //         url: "http://i.imgur.com/37w80TG.jpg",
+        //         imageTitle: "title",
+        //         imageDescription: "descski"
+        //     },
+        //     {
+        //         url: "http://i.imgur.com/tI5jq2c.jpg",
+        //         imageTitle: "title",
+        //         imageDescription: "descski"
+        //     },
+        //     {
+        //         url: "http://i.imgur.com/B1MCOtx.jpg",
+        //         imageTitle: "title",
+        //         imageDescription: "descski"
+        //     },
+        //     {
+        //         url: "http://i.imgur.com/37w80TG.jpg",
+        //         imageTitle: "title",
+        //         imageDescription: "descski"
+        //     }
+        // ]
 
         if (isMobile) {
             console.log('jeffski rendering mobile images');
@@ -109,10 +115,6 @@ class BlogImages extends React.Component {
         }
 
     }
-}
-
-BlogImages.propTypes = {
-    blogImageData: PropTypes.array
 }
 
 export default BlogImages;
