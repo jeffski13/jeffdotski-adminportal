@@ -67,7 +67,7 @@ class ViewBlogs extends Component {
 			status: STATUS_LOADING
 		}, () => {
 			//get list of blogs by trip name from server
-			getBlogs(this.state.availableTrips[this.state.tripIndexSelected].name, (err, data) => {
+			getBlogs(this.state.availableTrips[this.state.tripIndexSelected].id, (err, data) => {
 				if (err) {
 					console.log(err);
 					this.setState({ status: STATUS_FAILURE });

@@ -33,9 +33,11 @@ export default class BlogList extends React.Component {
             <div className="blog" key={blogItem.date}>
                 <div>Title: {blogItem.title}</div>
                 <div>Location: {blogItem.location}</div>
+                {blogItem.state && <div>State: {blogItem.state}</div>}
+                {blogItem.state && <div>Country: {blogItem.country}</div>}
                 <div>Date: {moment.unix(blogItem.date).format("MM/DD/YYYY")}</div>
                 {blogItem.blogContent.map(this.renderBlogtextItem)}
-                <img src={blogItem.titleImage} height="300px" />
+                <img src={blogItem.titleImageUrl} height="300px" />
                 <BlogImages blogImageData={blogItem.blogImages} />
             </div>
         );

@@ -28,10 +28,10 @@ export function uploadBlog(blogData, callback){
  * @param {string} tripName - the name of the trip for which you want the blogs
  * @param {function} callback - (err, data) - function which will return the blogs or an error from aws
  */
-export function getBlogs(tripName, callback){
+export function getBlogs(tripId, callback){
     axios({
         method: 'get',
-        url: `https://864wf8s3oi.execute-api.us-east-2.amazonaws.com/Prod/blogs_read?tripName=${tripName}`,
+        url: `https://864wf8s3oi.execute-api.us-east-2.amazonaws.com/Prod/alltripblogs?tripId=${tripId}`,
         headers: { 'x-api-key': AWS_API_KEY_READONLY }
     })
     .then((response) => {
