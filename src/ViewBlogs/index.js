@@ -1,18 +1,16 @@
 import React, { Component } from 'react';
 import { FormGroup, ControlLabel, FormControl, ButtonToolbar, Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import 'react-datepicker/dist/react-datepicker.css';
-import CircularProgress from 'material-ui/Progress/CircularProgress';
 
 import { getBlogs } from '../aws/blog';
 import { getTrips } from '../aws/trips';
 import BlogList from './BlogList';
+
+import { STATUS_LOADING, STATUS_FAILURE, STATUS_SUCCESS } from '../aws/networkConsts';
 import Indicator from '../aws/Indicator';
+import CircularProgress from 'material-ui/Progress/CircularProgress';
 
 import './styles.css';
-
-const STATUS_LOADING = 'STATUS_LOADING';
-const STATUS_FAILURE = 'STATUS_FAILURE';
-const STATUS_SUCCESS = 'STATUS_SUCCESS';
 
 class ViewBlogs extends Component {
 	constructor(props, context) {
