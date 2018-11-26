@@ -1,5 +1,6 @@
 import {AWS_API_KEY_AWS_ACCESS, AWS_API_KEY_READONLY} from '../configski';
 import axios from 'axios';
+import {defaultErrorResponse} from './networkConsts';
 
 /**
  * uploads a specified blog to aws
@@ -18,7 +19,10 @@ export function uploadBlog(blogData, callback){
         callback(null, response);
     })
     .catch((error) => {
-        callback(error);
+        if(error.response){
+            return callback(error.response);
+        }
+        return callback(defaultErrorResponse);
     });
 }
 
@@ -41,6 +45,9 @@ export function getBlogs(tripId, callback){
         callback(null, rawBlogResponseArr);
     })
     .catch(function (error) {
-        callback(error);
+        if(error.response){
+            return callback(error.response);
+        }
+        return callback(defaultErrorResponse);
     });
 }

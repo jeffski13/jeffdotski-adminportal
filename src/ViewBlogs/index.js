@@ -18,7 +18,12 @@ class ViewBlogs extends Component {
 			trip: 'Chile-2017',
 			blogData: [],
 			status: null,
-			tripId: null
+			tripId: null,
+			getBlogsResults: {
+                status: null,
+                message: null,
+                code: null
+            }
 		};
 	}
 
@@ -29,13 +34,21 @@ class ViewBlogs extends Component {
 	onTripSelected = () => {
 		this.setState({
 			status: STATUS_LOADING,
-			blogData: []
+			blogData: [],
+			getBlogsResults: null
 		}, ()=>{
 			//get list of blogs by trip name from server
 			getBlogs(this.state.tripId, (err, data) => {
 				if (err) {
 					console.log(err);
-					this.setState({ status: STATUS_FAILURE });
+					this.setState({ 
+						status: STATUS_FAILURE,
+						getBlogsResults: {
+                            status: err.status,
+                            message: err.data.message,
+                            code: err.data.code
+						} 
+					});
 					return;
 				}
 				console.log('jeffski be trippin: ', data);
@@ -48,6 +61,20 @@ class ViewBlogs extends Component {
 	}
 
 	render() {
+
+		let getAllBlogsServerMessage = null;
+        if (this.state.getBlogsResults && this.state.getBlogsResults.message) {
+            getAllBlogsServerMessage = (
+                <div className="tripServerResults" >
+                    <h4>Get All Blogs Results</h4>
+                    <div className="tripServerResultsText" >
+                        <div><strong>Message: </strong>{this.state.getBlogsResults.message}</div>
+                        {this.state.getBlogsResults.code && <div><strong>Code: </strong>{this.state.getBlogsResults.code}</div>}
+                        {this.state.getBlogsResults.status && <div><strong>Status: </strong>{this.state.getBlogsResults.status}</div>}
+                    </div>
+                </div>
+            );
+        }
 
 		return (
 			<div className="ViewBlogs">
@@ -67,6 +94,7 @@ class ViewBlogs extends Component {
 					{(this.state.status === STATUS_FAILURE)
 						&& <Indicator success={false} />}
 				</div>
+				{getAllBlogsServerMessage}
 				<BlogList blogsArr={this.state.blogData} />
 			</div>
 		);
