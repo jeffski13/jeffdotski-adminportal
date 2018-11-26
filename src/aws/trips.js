@@ -1,5 +1,6 @@
 import {AWS_API_KEY_READONLY, AWS_API_KEY_AWS_ACCESS} from '../configski';
 import axios from 'axios';
+import {defaultErrorResponse} from './networkConsts';
 
 /**
  * gets all trips for all blogs ever
@@ -19,7 +20,10 @@ export function getTrips(callback){
         callback(null, rawBlogResponseArr);
     })
     .catch(function (error) {
-        callback(error);
+        if(error.response){
+            return callback(error.response);
+        }
+        callback(defaultErrorResponse);
     });
 }
 
@@ -27,7 +31,7 @@ export function getTrip(tripId, callback){
     axios({
         method: 'get',
         url: `https://ctbw9plo6d.execute-api.us-east-2.amazonaws.com/Prod/trip?id=${tripId}`,
-        headers: { 'x-api-key': AWS_API_KEY_AWS_ACCESS }
+        headers: { 'X-Api-Key': AWS_API_KEY_AWS_ACCESS }
     })
     .then((response) => {
         //parse the response
@@ -36,6 +40,31 @@ export function getTrip(tripId, callback){
         callback(null, rawTripResponseArr);
     })
     .catch(function (error) {
-        callback(error);
+        if(error.response){
+            return callback(error.response);
+        }
+        return callback(defaultErrorResponse);
     });
 }
+
+export function createTrip(newTripInfo, callback){
+    axios({
+        method: 'post',
+        url: `https://ctbw9plo6d.execute-api.us-east-2.amazonaws.com/Prod/trip`,
+        headers: { 'X-Api-Key': AWS_API_KEY_AWS_ACCESS },
+        data: newTripInfo
+    })
+    .then((response) => {
+        //parse the response
+        let rawTripResponse = response.data;
+
+        callback(null, rawTripResponse);
+    })
+    .catch(function (error) {
+        if(error.response){
+            return callback(error.response);
+        }
+        return callback(defaultErrorResponse);
+    });
+}
+

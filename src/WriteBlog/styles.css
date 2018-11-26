@@ -14,8 +14,9 @@
     display: flex;
 }
 
-.WriteBlog__file_size {
-
+.tripSelectFormSection {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 /* section for autocomplete classes */

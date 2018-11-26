@@ -1,11 +1,13 @@
-.Trips {
-    padding-top: 20px;
-    padding-bottom: 20px;
-}
 
-.Trips > .getTripsSection {
+
+.Trips > .TripsDropdown {
     padding-bottom: 35px;
     border-bottom: 1px solid;
+}
+
+.existingTrips > .tripInformation {
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .tripServerResults {

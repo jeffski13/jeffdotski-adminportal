@@ -16,6 +16,7 @@ import { getTrips } from '../aws/trips';
 import './styles.css';
 import Indicator from '../aws/Indicator';
 import Completeit from './Completeit';
+import TripsDropdown from '../Trips/TripsDropdown';
 
 //statuses for all the things (blog images, title image, blog data) we will be uploading to the server
 const STATUS_SUCCESS = 'STATUS_SUCCESS';
@@ -43,6 +44,7 @@ class WriteBlog extends Component {
 
 		this.state = {
 			trip: '',
+			tripId: '',
 			location: 'TestCity',
 			date: moment().startOf('day'),
 			title: 'TestLoco',
@@ -86,7 +88,7 @@ class WriteBlog extends Component {
 	handleDateChange = (date) => {
 		this.setState({ date: date });
 	}
-	
+
 	handleTitleChange = (e) => {
 		this.setState({ title: e.target.value });
 	}
@@ -110,8 +112,8 @@ class WriteBlog extends Component {
 		let initializedBlogImagesUploadStatusArr = [];
 		let initializedBlogImageUrls = [];
 
-		if(this.state.blogImages.imgFiles !== undefined){
-			for(let i =0; i < this.state.blogImages.imgFiles.length; i++){
+		if (this.state.blogImages.imgFiles !== undefined) {
+			for (let i = 0; i < this.state.blogImages.imgFiles.length; i++) {
 				initializedBlogImagesUploadStatusArr.push(STATUS_LOADING);
 				initializedBlogImageUrls.push({
 					url: '',
@@ -120,7 +122,7 @@ class WriteBlog extends Component {
 				});
 			}
 		}
-		
+
 		//set state to loading so user cant submit blog twice
 		// and loading indicator appears
 		this.setState({
@@ -138,22 +140,22 @@ class WriteBlog extends Component {
 	uploadBlog_blogImages = () => {
 
 		//if no images, go ahead and upload the rest of the blog stuff
-		if(this.state.blogImages.imgFiles.length === 0){
+		if (this.state.blogImages.imgFiles.length === 0) {
 			this.uploadBlog_titleImage();
 		}
 
 		//upload all blog images
 		for (let i = 0; i < this.state.blogImages.imgFiles.length; i++) {
-            //upload the file
-            uploadPhoto(this.state.blogImages.imgFiles[i], this.state.trip, this.state.awsS3, (err, uploadedImgData) => {
-                //error handling
+			//upload the file
+			uploadPhoto(this.state.blogImages.imgFiles[i], this.state.trip, this.state.awsS3, (err, uploadedImgData) => {
+				//error handling
 				let imgStatusArr = [...this.state.blogImagesStatusArr];
 				let imgUrlArr = [...this.state.blogImagesUrls];
 
-                if (err) {
+				if (err) {
 					imgStatusArr[i] = STATUS_FAILURE;
 				}
-				else{
+				else {
 					//success: set status and fetch fresh list of all uploaded photos
 					imgStatusArr[i] = STATUS_SUCCESS;
 					imgUrlArr[i].url = uploadedImgData.Location;
@@ -163,21 +165,21 @@ class WriteBlog extends Component {
 				this.setState({
 					blogImagesStatusArr: imgStatusArr,
 					blogImagesUrls: imgUrlArr
-				},() => {
+				}, () => {
 					//if we have not failed already, go move forward with the uploading step
-					if(this.state.photoStatus === STATUS_LOADING){
+					if (this.state.photoStatus === STATUS_LOADING) {
 						this.uploadBlog_titleImage();
 					}
 				});
-            });
-        }
+			});
+		}
 	}
-	
+
 	//uploads the title image of the blog (title image is required)
-	uploadBlog_titleImage = () => { 
+	uploadBlog_titleImage = () => {
 		//check to make sure all blog images were uploaded successfully
-		for(let i = 0; i < this.state.blogImagesStatusArr.length; i++){
-			if(this.state.blogImagesStatusArr[i] === STATUS_FAILURE){
+		for (let i = 0; i < this.state.blogImagesStatusArr.length; i++) {
+			if (this.state.blogImagesStatusArr[i] === STATUS_FAILURE) {
 				//we have failed, sad day
 				this.setState({
 					photoStatus: STATUS_FAILURE,
@@ -185,7 +187,7 @@ class WriteBlog extends Component {
 				});
 				return;
 			}
-			if(this.state.blogImagesStatusArr[i] === STATUS_LOADING){
+			if (this.state.blogImagesStatusArr[i] === STATUS_LOADING) {
 				//we are still loading blog images. 
 				return;
 			}
@@ -212,7 +214,7 @@ class WriteBlog extends Component {
 			this.uploadBlog_blogData();
 		});
 	}
-	
+
 	uploadBlog_blogData = () => {
 		//send request with new blog entry
 		// TEST TRIP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -225,20 +227,20 @@ class WriteBlog extends Component {
 			blogContent: this.state.blogtext,
 			blogImages: this.state.blogImagesUrls
 		}
-		
+
 		uploadBlog(blogdata, (err, data) => {
 			////////////////////////////////
 			//upload blog call complete
 			////////////////////////////////
 			console.log('jeffski, blog upload complete data:', data, ' error', err);
-			if(err){
-				this.setState({ 
+			if (err) {
+				this.setState({
 					blogStatus: STATUS_FAILURE,
-					photoStatus: null 
+					photoStatus: null
 				});
 				return;
 			}
-			this.setState({ blogStatus: STATUS_SUCCESS }, ()=>{
+			this.setState({ blogStatus: STATUS_SUCCESS }, () => {
 				console.log('jeffski state after upload: ', this.state);
 			});
 		});
@@ -252,7 +254,7 @@ class WriteBlog extends Component {
 	//returns true if the blog is ready to be submitted to the server
 	isFormSubmitAllowed() {
 		//form should not submit if we are currently uploading anything
-		if(this.state.blogStatus === STATUS_LOADING || this.state.photoStatus === STATUS_LOADING){
+		if (this.state.blogStatus === STATUS_LOADING || this.state.photoStatus === STATUS_LOADING) {
 			return false;
 		}
 
@@ -267,7 +269,7 @@ class WriteBlog extends Component {
 	}
 
 	getTitleImageSize = () => {
-		if(this.state.titleImage.size){
+		if (this.state.titleImage.size) {
 			let finalStr = this.state.titleImage.size;
 			finalStr = finalStr / 1000;
 			return ' ' + finalStr + ' kB'
@@ -275,35 +277,35 @@ class WriteBlog extends Component {
 	}
 
 	storeCarouselImages = (imgData) => {
-		this.setState({blogImages: imgData});
+		this.setState({ blogImages: imgData });
 	}
 
 	renderBlogUploadStatusMessage = () => {
 		//we upload photos first
-		if(this.state.photoStatus === STATUS_LOADING){
+		if (this.state.photoStatus === STATUS_LOADING) {
 			let blogPhotosInProgressCount = 0;
 			let blogPhotosSuccessCount = 0;
 			this.state.blogImagesStatusArr.forEach((nextStatus) => {
-				if(nextStatus === STATUS_LOADING){
+				if (nextStatus === STATUS_LOADING) {
 					blogPhotosInProgressCount++;
 				}
-				if(nextStatus === STATUS_SUCCESS){
+				if (nextStatus === STATUS_SUCCESS) {
 					blogPhotosSuccessCount++;
 				}
 			});
 
-			if(blogPhotosInProgressCount > 0){
+			if (blogPhotosInProgressCount > 0) {
 				return (
 					<div>Uploaded {blogPhotosSuccessCount} of {this.state.blogImagesStatusArr.length}</div>
 				);
 			}
-			else{
+			else {
 				return (
 					<div>Uploading Title Photo</div>
 				);
 			}
 		}
-		if(this.state.blogStatus === STATUS_LOADING){
+		if (this.state.blogStatus === STATUS_LOADING) {
 			return (
 				<div>Uploading Blog Data</div>
 			);
@@ -323,20 +325,27 @@ class WriteBlog extends Component {
 					/>
 				</div>
 				<form>
+					<div className="tripSelectFormSection">
+						<TripsDropdown
+							sortAlphabetically={false}
+							onTripReturned={(tripInfoReturned) => {
+								this.setState({
+									trip: tripInfoReturned.name,
+									tripId: tripInfoReturned.id
+								});
+							}} />
+					</div>
 					<FormGroup
-						controlId="WriteBlog-tripFormInput"
+						controlId="tripFormInput"
 						validationState={validateFormString(this.state.trip)}
 					>
 						<ControlLabel>Trip</ControlLabel>
-						<Completeit
-							suggestions={this.state.availableTrips}
-							userInputChangedCallback={(tripInput) => {
-								this.setState({
-									trip: tripInput
-								});
-							}}  
-						/>
+						<FormControl.Feedback />
+							<div>
+								{this.state.trip}
+							</div>
 					</FormGroup>
+						
 					<FormGroup
 						controlId="locationFormInput"
 						validationState={validateFormString(this.state.location)}
@@ -367,14 +376,14 @@ class WriteBlog extends Component {
 					<FormGroup
 						controlId="imageSelectForm"
 						validationState={validateFormString(this.state.titleImage.name)}
-						>
+					>
 						<ControlLabel>Title Image</ControlLabel>
 						<div className="WriteBlog__file_details" >
 							<FormControl
 								type="file"
 								placeholder="Choose Image File"
 								onChange={this.handleImgFileChange}
-								/>
+							/>
 							<strong className="WriteBlog__file_size" >
 								{this.getTitleImageSize()}
 							</strong>
@@ -388,7 +397,7 @@ class WriteBlog extends Component {
 				/>
 
 				{/* insert carousel here */}
-				<ImageCarousel 
+				<ImageCarousel
 					imageSelectedCallback={(imgData) => {
 						//NOTE to implementing components: 
 						//formDataCallback can/should be called with data parameter as null if form data is invalid
