@@ -29,10 +29,10 @@ export default class Trips extends React.Component {
             },
             tripInfo: null,
             tripCreation: {
-                location: '???',
-                name: '???',
-                year: 2300,
-                month: 10
+                location: '',
+                name: '',
+                year: 0,
+                month: 0
             }
         };
     }
@@ -75,7 +75,6 @@ export default class Trips extends React.Component {
                 }
                 //declare victory! and clear out trip creation stuff
                 //refresh trips
-                this.getTrips();
                 this.setState({
                     createTripStatus: STATUS_SUCCESS,
                     tripCreation: {},
