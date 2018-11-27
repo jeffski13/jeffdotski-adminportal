@@ -45,6 +45,8 @@ class WriteBlog extends Component {
 		this.state = {
 			trip: '',
 			tripId: '',
+			country: 'USA',
+			state: 'Oklahomaland',
 			location: 'TestCity',
 			date: moment().startOf('day'),
 			title: 'TestLoco',
@@ -95,6 +97,14 @@ class WriteBlog extends Component {
 
 	handleParagraphsChange = (e) => {
 		this.setState({ paragraphs: e.target.value });
+	}
+
+	handleCountryChange = (e) => {
+		this.setState({ country: e.target.value });
+	}
+
+	handleStateChange = (e) => {
+		this.setState({ state: e.target.value });
 	}
 
 	handleLocationChange = (e) => {
@@ -217,13 +227,14 @@ class WriteBlog extends Component {
 
 	uploadBlog_blogData = () => {
 		//send request with new blog entry
-		// TEST TRIP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		let blogdata = {
-			tripId: "uuid1234",
-			title: this.state.title,
-			location: this.state.location,
 			date: moment(this.state.date.valueOf()).unix(),
-			titleImage: this.state.titleImageUrl,
+			country: this.state.country,
+			location: this.state.location,
+			state: this.state.state,
+			title: this.state.title,
+			titleImageUrl: this.state.titleImageUrl,
+			tripId: this.state.tripId,
 			blogContent: this.state.blogtext,
 			blogImages: this.state.blogImagesUrls
 		}
@@ -258,11 +269,17 @@ class WriteBlog extends Component {
 			return false;
 		}
 
-		if (validateFormString(this.state.title) === FORM_SUCCESS &&
-			validateFormString(this.state.trip) === FORM_SUCCESS &&
-			validateFormString(this.state.titleImage.name) === FORM_SUCCESS &&
+		console.log('jeffski validating: ', this.state);
+		if (
+			validateFormString(this.state.country) === FORM_SUCCESS &&
 			validateDate(moment(this.state.date.valueOf()).unix()) === FORM_SUCCESS &&
-			validateFormString(this.state.location) === FORM_SUCCESS) {
+			validateFormString(this.state.location) === FORM_SUCCESS &&
+			validateFormString(this.state.state) === FORM_SUCCESS &&
+			validateFormString(this.state.title) === FORM_SUCCESS &&
+			validateFormString(this.state.tripId) === FORM_SUCCESS &&
+			this.state.titleImage && validateFormString(this.state.titleImage.name) === FORM_SUCCESS &&
+			this.state.blogtext && this.state.blogtext.length > 0
+		) {
 			return true;
 		}
 		return false;
@@ -341,11 +358,39 @@ class WriteBlog extends Component {
 					>
 						<ControlLabel>Trip</ControlLabel>
 						<FormControl.Feedback />
-							<div>
-								{this.state.trip}
-							</div>
+						<div>
+							{this.state.trip}
+						</div>
 					</FormGroup>
-						
+
+					<FormGroup
+						controlId="countryFormInput"
+						validationState={validateFormString(this.state.country)}
+					>
+						<ControlLabel>Country</ControlLabel>
+						<FormControl
+							type="text"
+							value={this.state.country}
+							placeholder="Enter an Earth Country (Other worlds not yet supported)"
+							onChange={this.handleCountryChange}
+						/>
+						<FormControl.Feedback />
+					</FormGroup>
+
+					<FormGroup
+						controlId="stateFormInput"
+						validationState={validateFormString(this.state.state)}
+					>
+						<ControlLabel>State</ControlLabel>
+						<FormControl
+							type="text"
+							value={this.state.state}
+							placeholder="Enter a State/Region Name"
+							onChange={this.handleStateChange}
+						/>
+						<FormControl.Feedback />
+					</FormGroup>
+
 					<FormGroup
 						controlId="locationFormInput"
 						validationState={validateFormString(this.state.location)}

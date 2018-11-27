@@ -11,7 +11,7 @@ import {defaultErrorResponse} from './networkConsts';
 export function uploadBlog(blogData, callback){
     axios({
         method: 'post',
-        url: `https://ctbw9plo6d.execute-api.us-east-2.amazonaws.com/Prod/blogs_read`,
+        url: `https://ctbw9plo6d.execute-api.us-east-2.amazonaws.com/Prod/blogs`,
         headers: { 'x-api-key': AWS_API_KEY_AWS_ACCESS },
         data: blogData
     })
