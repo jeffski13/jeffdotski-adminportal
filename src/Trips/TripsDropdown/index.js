@@ -12,6 +12,7 @@ export default class TripsDropdown extends React.Component {
 
     static propTypes = {
         onTripReturned: PropTypes.func.isRequired,
+        onTripSelected: PropTypes.func,
         onTripsReturned: PropTypes.func,
         // if false, will sort by date
         sortAlphabetically: PropTypes.bool
@@ -20,6 +21,7 @@ export default class TripsDropdown extends React.Component {
     //default onTripsReturned to empty function to avoid crash
     static defaultProps = {
         onTripsReturned: () => { },
+        onTripSelected: () => { },
         sortAlphabetically: true
     };
 
@@ -109,6 +111,8 @@ export default class TripsDropdown extends React.Component {
             tripInfo: null,
             getTripsStatus: STATUS_LOADING
         }, () => {
+            //callback to parent, they will appreciate it
+            this.props.onTripSelected();
             //get list of blogs by trip name from server
             getTrip(this.state.availableTrips[this.state.tripIndexSelected].id, (err, data) => {
                 if (err) {

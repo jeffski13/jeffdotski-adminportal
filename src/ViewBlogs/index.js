@@ -33,9 +33,15 @@ class ViewBlogs extends Component {
 
 	onTripSelected = () => {
 		this.setState({
-			status: STATUS_LOADING,
-			blogData: [],
 			getBlogsResults: null
+		});
+	}
+
+	onTripReturned = (tripInfoReturned) => {
+		this.setState({
+			status: STATUS_LOADING,
+			tripId: tripInfoReturned.id,
+			blogData: []
 		}, ()=>{
 			//get list of blogs by trip name from server
 			getBlogs(this.state.tripId, (err, data) => {
@@ -80,11 +86,11 @@ class ViewBlogs extends Component {
 			<div className="ViewBlogs">
 				<TripsDropdown
 					sortAlphabetically={false}
-					onTripReturned={(tripInfoReturned) => {
-						this.setState({
-							tripId: tripInfoReturned.id
-						});
+					onTripSelected={()=>{
 						this.onTripSelected();
+					}}
+					onTripReturned={(tripInfoReturned) => {
+						this.onTripReturned(tripInfoReturned);
 					}} />
 				<div id="getBlogsIndicator">
 					{(this.state.status === STATUS_LOADING)

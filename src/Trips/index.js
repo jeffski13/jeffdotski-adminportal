@@ -15,12 +15,6 @@ export default class Trips extends React.Component {
         super(props);
 
         this.state = {
-            getTripsStatus: null,
-            getTripResults: {
-                status: null,
-                message: null,
-                code: null
-            },
             createTripStatus: null,
             createTripResults: {
                 status: null,
@@ -40,7 +34,7 @@ export default class Trips extends React.Component {
     //returns true if the blog is ready to be submitted to the server
     isFormSubmitAllowed() {
         //form should not submit if we are currently uploading anything
-        if (this.state.blogStatus === STATUS_LOADING || this.state.photoStatus === STATUS_LOADING) {
+        if (this.state.createTripStatus === STATUS_LOADING) {
             return false;
         }
 
@@ -75,9 +69,15 @@ export default class Trips extends React.Component {
                 }
                 //declare victory! and clear out trip creation stuff
                 //refresh trips
+                this.childTripsDropdown.getTrips();
                 this.setState({
                     createTripStatus: STATUS_SUCCESS,
-                    tripCreation: {},
+                    tripCreation: {
+                        location: '',
+                        name: '',
+                        year: 0,
+                        month: 0
+                    },
                     createTripResults: {
                         message: 'Trip created!'
                     }
@@ -117,12 +117,14 @@ export default class Trips extends React.Component {
 
         return (
 
-
             <div className="Trips">
                 <div className="getTripsSection">
-                    <TripsDropdown onTripReturned={(tripInfoReturned) => {
-                        this.setState({ tripInfo: tripInfoReturned });
-                    }} />
+                    <TripsDropdown
+                        onTripReturned={(tripInfoReturned) => {
+                            this.setState({ tripInfo: tripInfoReturned });
+                        }}
+                        ref={instance => { this.childTripsDropdown = instance; }}
+                    />
                     {this.state.tripInfo && getTripDetailsContent}
                 </div>
 
