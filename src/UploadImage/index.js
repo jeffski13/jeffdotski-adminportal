@@ -6,6 +6,7 @@ import CircularProgress from 'material-ui/Progress/CircularProgress';
 import Indicator from '../aws/Indicator';
 import { uploadPhoto, fetchBlogObjects } from '../aws/photo';
 import { AWS_S3_REGION, AWS_IDENTITY_POOL_ID_AWS_ACCESS } from '../configski';
+import ResizeImg from './ResizeImg';
 //constants for AWS S3 SDK
 
 const STATUS_LOADING = 'STATUS_LOADING';
@@ -81,7 +82,7 @@ class UploadImage extends React.Component {
         //iterate through all the photo files and upload them
         for (let i = 0; i < this.state.imgFile.length; i++) {
             //does file exist?
-            if (this.doesFileExist(this.state.imgFile[i], 'Disney2018')) {
+            if (this.doesFileExist(this.state.imgFile[i], 'Jeffski2020')) {
                 this.setState({
                     statusMessage: `image ${this.state.imgFile[i].name} exists on server`,
                     status: STATUS_SUCCESS
@@ -90,7 +91,7 @@ class UploadImage extends React.Component {
             }
 
             //upload the file
-            uploadPhoto(this.state.imgFile[i], 'Disney2018', this.state.awsS3, (err, data) => {
+            uploadPhoto(this.state.imgFile[i], 'Jeffski2020', this.state.awsS3, (err, data) => {
                 //error handling
                 if (err) {
                     this.setState({ 
@@ -119,7 +120,7 @@ class UploadImage extends React.Component {
         }
         return false;
     }
-
+    
     renderBlogDirectories = (blogDirectoryItem, index) => {
         return (
             <div key={index}>
@@ -127,11 +128,12 @@ class UploadImage extends React.Component {
             </div>
         );
     }
-
+    
     render() {
-
         return (
             <div className="UploadImage">
+                <ResizeImg />
+                UPLOAD IMAGE
                 <form>
                     <FormGroup
                         controlId="imageSelectski"
@@ -179,7 +181,6 @@ class UploadImage extends React.Component {
                         </div>
                         : null
                 }
-
             </div>
         );
     }
