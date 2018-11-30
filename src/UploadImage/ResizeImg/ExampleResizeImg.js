@@ -21,7 +21,7 @@ export default class ExampleResizeImg extends React.Component {
         }
     }
 
-    thumb = (event) => {
+    onImagesChosen = (event) => {
 
         let files = event.target.files;
         if (files == null || files == undefined) {
@@ -145,7 +145,7 @@ export default class ExampleResizeImg extends React.Component {
                         multiple
                         type="file"
                         placeholder="Choose File"
-                        onChange={this.thumb}
+                        onChange={this.onImagesChosen}
                         accept='image/*'
                         />
                 </FormGroup>
