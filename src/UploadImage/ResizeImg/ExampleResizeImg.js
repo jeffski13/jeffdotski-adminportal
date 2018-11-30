@@ -13,6 +13,12 @@ export default class ExampleResizeImg extends React.Component {
 
         this.state = {
             s3paths: [],
+            thumbnailUrls : [
+                {
+                    filename: '',
+                    url: ''
+                }
+            ],
             picsToUpload: -1,
             picsSuccessful: -1,
             picsFailed: -1,
@@ -24,13 +30,13 @@ export default class ExampleResizeImg extends React.Component {
     onImagesChosen = (event) => {
 
         let files = event.target.files;
-        if (files == null || files == undefined) {
-            document.write("This Browser has no support for HTML5 FileReader yet!");
+        if (files == null || files == undefined || files.length === 0) {
             return false;
         }
 
         this.setState({
             s3paths: [],
+            thumbnailUrls: [],
             picsToUpload: files.length,
             picsSuccessful: 0,
             picsFailed: 0,
@@ -46,68 +52,66 @@ export default class ExampleResizeImg extends React.Component {
 
             let reader = new FileReader();
             if (reader != null) {
-                reader.onload = this.GetThumbnail;
+                reader.onload = (event) => {
+                    var resizedCanvas = document.createElement('canvas');
+                    var img = new Image();
+                    img.src = event.target.result;
+                    var parentReactComponent = this;
+            
+                    img.onload = function () {
+                        resizedCanvas.id = "myTempCanvas";
+                        var fixHeight = 250;
+                        var ratioedWidth = Math.floor((this.width * fixHeight) / this.height);
+                        resizedCanvas.width = Number(ratioedWidth);
+                        resizedCanvas.height = Number(fixHeight);
+            
+                        if (resizedCanvas.getContext) {
+                            var cntxt = resizedCanvas.getContext("2d");
+                            cntxt.drawImage(img, 0, 0, resizedCanvas.width, resizedCanvas.height);
+                            var dataURL = resizedCanvas.toDataURL();
+            
+                            resizedCanvas.toBlob((createdBlog) => {
+                                //upload the file
+                                uploadPhotoThumbnail(createdBlog, 'Jeffski2025thumb', (err, data) => {
+                                    //error handling
+                                    if (err) {
+                                        parentReactComponent.setState({
+                                            picsFailed: parentReactComponent.state.picsFailed + 1,
+                                            thumbnailNetworkStatus: STATUS_FAILURE
+                                        });
+                                        return;
+                                    }
+                                    //success: set status to success if we are done and all is well 
+                                    let networkstatus = STATUS_LOADING;
+                                    if (parentReactComponent.state.picsFailed + parentReactComponent.state.picsSuccessful + 1 === parentReactComponent.state.picsToUpload && parentReactComponent.state.picsFailed === 0) {
+                                        networkstatus = STATUS_SUCCESS;
+                                    }
+                                    parentReactComponent.setState({
+                                        s3paths: [...parentReactComponent.state.s3paths, data.Location],
+                                        picsSuccessful: parentReactComponent.state.picsSuccessful + 1,
+                                        thumbnailNetworkStatus: networkstatus,
+                                        thumbnailUrls: [...parentReactComponent.state.thumbnailUrls, {
+                                            filename: file.name,
+                                            url: data.Location
+                                        }]
+                                    });
+                                });
+            
+                                //draw it on screen
+                                if (dataURL != null && dataURL != undefined) {
+                                    var nImg = document.createElement('img');
+                                    nImg.src = dataURL;
+                                    document.body.appendChild(nImg);
+                                }
+                                else {
+                                    alert('unable to get context');
+                                }
+                            })
+            
+                        }
+                    }
+                };
                 reader.readAsDataURL(file);
-            }
-        }
-    }
-
-    GetThumbnail = (event) => {
-        var resizedCanvas = document.createElement('canvas');
-        var img = new Image();
-        img.src = event.target.result;
-        var parentReactComponent = this;
-        img.onload = function () {
-
-            resizedCanvas.id = "myTempCanvas";
-            var fixHeight = 250;
-            var ratioedWidth = Math.floor((this.width * fixHeight) / this.height);
-            resizedCanvas.width = Number(ratioedWidth);
-            resizedCanvas.height = Number(fixHeight);
-
-            if (resizedCanvas.getContext) {
-                var cntxt = resizedCanvas.getContext("2d");
-                cntxt.drawImage(img, 0, 0, resizedCanvas.width, resizedCanvas.height);
-                var dataURL = resizedCanvas.toDataURL();
-                var resizedImgToUpload = {
-                    name: "filenameski",
-                    src: dataURL
-                }
-
-                resizedCanvas.toBlob((createdBlog) => {
-                    //upload the file
-                    uploadPhotoThumbnail(createdBlog, 'Jeffski2025thumb', (err, data) => {
-                        //error handling
-                        if (err) {
-                            parentReactComponent.setState({
-                                picsFailed: parentReactComponent.state.picsFailed + 1,
-                                thumbnailNetworkStatus: STATUS_FAILURE
-                            });
-                            return;
-                        }
-                        //success: set status to success if we are done and all is well 
-                        let networkstatus = STATUS_LOADING;
-                        if (parentReactComponent.state.picsFailed + parentReactComponent.state.picsSuccessful + 1 === parentReactComponent.state.picsToUpload && parentReactComponent.state.picsFailed === 0) {
-                            networkstatus = STATUS_SUCCESS;
-                        }
-                        parentReactComponent.setState({
-                            s3paths: [...parentReactComponent.state.s3paths, data.Location],
-                            picsSuccessful: parentReactComponent.state.picsSuccessful + 1,
-                            thumbnailNetworkStatus: networkstatus
-                        });
-                    });
-
-                    //draw it on screen
-                    if (dataURL != null && dataURL != undefined) {
-                        var nImg = document.createElement('img');
-                        nImg.src = dataURL;
-                        document.body.appendChild(nImg);
-                    }
-                    else {
-                        alert('unable to get context');
-                    }
-                })
-
             }
         }
     }
@@ -121,6 +125,10 @@ export default class ExampleResizeImg extends React.Component {
     }
 
     render() {
+        if(this.state.thumbnailNetworkStatus === STATUS_SUCCESS){
+            console.log('jeffski render state: ', this.state.thumbnailUrls);
+        }
+
         let uploadProgress = null;
         if (this.state.picsToUpload > 0) {
             let picsFailedReadout = null;
