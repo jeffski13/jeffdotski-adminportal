@@ -5,7 +5,6 @@ import { AWS_S3_BUCKET_NAME } from '../configski';
 import { AWS_S3_REGION, AWS_IDENTITY_POOL_ID_AWS_ACCESS } from '../configski';
 
 export function uploadPhotoThumbnail(file, tripName, callback) {
-    console.log('jeffski: file uploading ', file, tripName);
     // cant do stuff without a file
     if(!file){
         return;

@@ -6,18 +6,16 @@ import CircularProgress from 'material-ui/Progress/CircularProgress';
 import Indicator from '../../aws/Indicator';
 import { STATUS_LOADING, STATUS_FAILURE, STATUS_SUCCESS } from '../../aws/networkConsts';
 
-export default class ResizeImgExample extends React.Component {
+export default class ResizeImg extends React.Component {
 
     static propTypes = {
-        filesToThumbAndUpload: PropTypes.array.isRequired,
-        onPhotoFinished: PropTypes.func,
-        onAllPhotosFinished: PropTypes.func
+        filesToThumbAndUpload: PropTypes.object.isRequired,
+        onPhotoFinished: PropTypes.func
     };
 
     //default onTripsReturned to empty function to avoid crash
     static defaultProps = {
-        onPhotoFinished: () => { },
-        onAllPhotosFinished: () => { }
+        onPhotoFinished: (err, uploadedData) => { }
     };
 
     constructor(props) {
@@ -41,9 +39,15 @@ export default class ResizeImgExample extends React.Component {
     componentDidMount() {
         this.createThumnailAndUpload();
     }
+    
+    shouldComponentUpdate(nextProps, nextState){
+        if(this.props.filesToThumbAndUpload !== nextProps.filesToThumbAndUpload){
+            this.createThumnailAndUpload();
+        }
+    }
 
     createThumnailAndUpload = () => {
-        
+
         let files = this.props.filesToThumbAndUpload;
         if (files == null || files == undefined || files.length === 0) {
             // fail here as they didnt give files we needed.
@@ -61,6 +65,7 @@ export default class ResizeImgExample extends React.Component {
 
         for (var i = 0; i < files.length; i++) {
             let file = files[i];
+            let fileIndex = i;
             let imageType = /image.*/;
             if (!file.type.match(imageType)) {
                 continue;
@@ -95,6 +100,11 @@ export default class ResizeImgExample extends React.Component {
                                 uploadPhotoThumbnail(createdBlog, 'Jeffski2025thumb', (err, data) => {
                                     //error handling
                                     if (err) {
+                                        parentReactComponent.props.onPhotoFinished({
+                                            error: err,
+                                            filename: file.name,
+                                            index: fileIndex
+                                        });
                                         parentReactComponent.setState({
                                             picsFailed: parentReactComponent.state.picsFailed + 1,
                                             thumbnailNetworkStatus: STATUS_FAILURE
@@ -103,9 +113,20 @@ export default class ResizeImgExample extends React.Component {
                                     }
                                     //success: set status to success if we are done and all is well 
                                     let networkstatus = STATUS_LOADING;
-                                    if (parentReactComponent.state.picsFailed + parentReactComponent.state.picsSuccessful + 1 === parentReactComponent.state.picsToUpload && parentReactComponent.state.picsFailed === 0) {
-                                        networkstatus = STATUS_SUCCESS;
+                                    if (parentReactComponent.state.picsFailed + parentReactComponent.state.picsSuccessful + 1 === parentReactComponent.state.picsToUpload) {
+                                        if(parentReactComponent.state.picsFailed === 0){
+                                            networkstatus = STATUS_SUCCESS;
+                                        }
+                                        else {
+                                            //something must have failed. bummer
+                                            networkstatus = STATUS_FAILURE;
+                                        }
                                     }
+                                    parentReactComponent.props.onPhotoFinished(null, {
+                                        filename: file.name,
+                                        index: fileIndex,
+                                        url: data.Location
+                                    });
                                     parentReactComponent.setState({
                                         thumbnailUrls: [...parentReactComponent.state.thumbnailUrls,{
                                             filename: file.name,
@@ -115,17 +136,7 @@ export default class ResizeImgExample extends React.Component {
                                         thumbnailNetworkStatus: networkstatus
                                     });
                                 });
-            
-                                //draw it on screen
-                                if (dataURL != null && dataURL != undefined) {
-                                    var nImg = document.createElement('img');
-                                    nImg.src = dataURL;
-                                    document.body.appendChild(nImg);
-                                }
-                                else {
-                                    alert('unable to get context');
-                                }
-                            })
+                            });
             
                         }
                     }
