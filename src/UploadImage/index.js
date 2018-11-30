@@ -6,7 +6,7 @@ import CircularProgress from 'material-ui/Progress/CircularProgress';
 import Indicator from '../aws/Indicator';
 import { uploadPhoto, fetchBlogObjects } from '../aws/photo';
 import { AWS_S3_REGION, AWS_IDENTITY_POOL_ID_AWS_ACCESS } from '../configski';
-import ResizeImg from './ResizeImg';
+import ExampleResizeImg from './ResizeImg/ExampleResizeImg';
 //constants for AWS S3 SDK
 
 const STATUS_LOADING = 'STATUS_LOADING';
@@ -132,7 +132,7 @@ class UploadImage extends React.Component {
     render() {
         return (
             <div className="UploadImage">
-                <ResizeImg />
+                <ExampleResizeImg />
                 UPLOAD IMAGE
                 <form>
                     <FormGroup

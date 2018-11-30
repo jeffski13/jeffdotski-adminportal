@@ -18,7 +18,8 @@
     "react-image-gallery": "^0.8.10",
     "react-loading": "^1.0.4",
     "react-scripts": "^2.1.1",
-    "redux": "^3.7.2"
+    "redux": "^3.7.2",
+    "uuid": "^3.3.2"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,11 +1,13 @@
 import React from 'react';
+import { FormGroup, FormControl } from 'react-bootstrap';
 import { uploadPhotoThumbnail } from '../../aws/thumbnail';
 import CircularProgress from 'material-ui/Progress/CircularProgress';
 
 import Indicator from '../../aws/Indicator';
 import { STATUS_LOADING, STATUS_FAILURE, STATUS_SUCCESS } from '../../aws/networkConsts';
 
-export default class ResizeImgExample extends React.Component {
+export default class ExampleResizeImg extends React.Component {
+    
     constructor(props) {
         super(props);
 
@@ -137,6 +139,16 @@ export default class ResizeImgExample extends React.Component {
 
         return (
             <div>
+                RESIZE IMAGE:
+                <FormGroup controlId="imageSelectski" >
+                    <FormControl
+                        multiple
+                        type="file"
+                        placeholder="Choose File"
+                        onChange={this.thumb}
+                        accept='image/*'
+                        />
+                </FormGroup>
                 <span>
                     {(this.state.thumbnailNetworkStatus === STATUS_LOADING)
                         && <CircularProgress />}
@@ -146,6 +158,7 @@ export default class ResizeImgExample extends React.Component {
                         && <Indicator success={false} />}
                     {uploadProgress}
                 </span>
+                {this.state.s3paths.map(this.renderThumbnailUrls)}
             </div>
         );
     }
