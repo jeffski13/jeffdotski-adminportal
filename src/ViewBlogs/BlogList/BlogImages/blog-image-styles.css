@@ -13,6 +13,10 @@ img {
     background-color: black;
 }
 
+.image-gallery-image > img {
+    min-height: 600px;
+}
+
 .BlogImages-mobile-responsive-images {
     max-width: 400px;
     margin-left: auto;

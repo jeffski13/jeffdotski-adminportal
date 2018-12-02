@@ -43,16 +43,6 @@ export default class BlogList extends React.Component {
         );
     }
 
-    sortBlogsByDate = (a,b) => {
-        if (a.date < b.date){
-            return 1;
-        }
-        if (a.date > b.date){
-            return -1;
-        }
-        return 0;
-    }
-
     render(){
         //order blogs by date
         let blogsArr = [...this.props.blogsArr];
@@ -60,7 +50,6 @@ export default class BlogList extends React.Component {
             return null;
         }
 
-        blogsArr.sort(this.sortBlogsByDate);
         return (
             <div className="BlogList">
                 {blogsArr.map(this.renderBlogItem)}

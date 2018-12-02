@@ -56,14 +56,6 @@ class BlogImages extends React.Component {
             return null;
         }
 
-        let images = [];
-        this.props.blogImageData.forEach(nextBlogImageData => {
-            images.push({
-                rawUrl: nextBlogImageData.url,
-                thumbUrl: nextBlogImageData.thumbnailUrl
-            });
-        });
-
         //is it time to go mobile?
         let isMobile = false;
         if (this.state.width <= 650) {
@@ -75,7 +67,7 @@ class BlogImages extends React.Component {
                 <React.Fragment>
                     <div className="BlogImages-top-spacer" />
                     <div >
-                        {images.map(this.renderBlogImageItems)}
+                        {this.props.blogImageData.map(this.renderBlogImageItems)}
                     </div>
                 </React.Fragment>
             );
@@ -84,7 +76,7 @@ class BlogImages extends React.Component {
             return (
                 <React.Fragment>
                     <div className="BlogImages-top-spacer" />
-                    <ReactImageCarousel images={images} />
+                    <ReactImageCarousel images={this.props.blogImageData} />
                 </React.Fragment>
             );
         }

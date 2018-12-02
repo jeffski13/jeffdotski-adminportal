@@ -57,7 +57,19 @@ class ViewBlogs extends Component {
 					});
 					return;
 				}
+
+				data.sort((a,b) => {
+					if (a.date < b.date){
+						return 1;
+					}
+					if (a.date > b.date){
+						return -1;
+					}
+					return 0;
+				});
+
 				console.log('jeffski be trippin: ', data);
+				
 				this.setState({
 					blogData: data,
 					status: STATUS_SUCCESS
