@@ -17,6 +17,8 @@ import './styles.css';
 import Indicator from '../aws/Indicator';
 import Completeit from './Completeit';
 import TripsDropdown from '../Trips/TripsDropdown';
+import { fail } from 'assert';
+import ResizeImg from '../UploadImage/ResizeImg'
 
 //statuses for all the things (blog images, title image, blog data) we will be uploading to the server
 const STATUS_SUCCESS = 'STATUS_SUCCESS';
@@ -43,23 +45,25 @@ class WriteBlog extends Component {
 		let s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 		this.state = {
-			trip: '',
-			tripId: '',
-			country: 'USA',
-			state: 'Oklahomaland',
-			location: 'TestCity',
+			trip: 'Journey With Jesus',
+			tripId: '98d67740-f43b-11e8-8f4f-15e76e2a2611',
+			country: 'Merica',
+			state: 'TX',
+			location: 'ze nest',
 			date: moment().startOf('day'),
-			title: 'TestLoco',
+			title: 'Started from Oklahoma, now i here',
 			titleImage: {},
 			titleImageUrl: null,
-			blogtext: [],
+			blogtext: [{ text: "yoloswag" }],
 			blogImages: {
 				imgFiles: []
 			},
 			blogImagesUrls: [],
 			blogImagesStatusArr: [],
-			photoStatus: null, //status for both blog photos and title photo
+			blogImagesThumbnailStatusArr: [],
+			titleImgNetworkStatus: null, //status for both blog photos and title photo
 			blogStatus: null, //status for blog data
+			networkStatusErrorMesage: '',
 			awsS3: s3,
 			availableTrips: []
 		};
@@ -117,145 +121,242 @@ class WriteBlog extends Component {
 
 	//upload photo/blog to server
 	onUploadBlogClicked = () => {
+		//when we are done initializing state for upload, well...start the upload!
+		this.uploadBlog_blogImages((errMsg) => {
+			if (errMsg) {
+				this.setState({
+					networkStatusErrorMesage: errMsg
+				});
+				return;
+			}
+			else {
+				// do nothing here. Uploading continues in another method
+				// Need to wait until thumbnails and images are done to continue
+			}
+		});
+	}
+
+	//uploads all blog images (these images are optional)
+	uploadBlog_blogImages = (callback) => {
+
+		//if no images we are all done here!
+		if (this.state.blogImages.imgFiles.length === 0) {
+			callback(null);
+		}
 
 		//initialize variables for loading progress
 		let initializedBlogImagesUploadStatusArr = [];
+		let initializedBlogImagesThumbnailUploadStatusArr = [];
 		let initializedBlogImageUrls = [];
 
 		if (this.state.blogImages.imgFiles !== undefined) {
 			for (let i = 0; i < this.state.blogImages.imgFiles.length; i++) {
 				initializedBlogImagesUploadStatusArr.push(STATUS_LOADING);
+				initializedBlogImagesThumbnailUploadStatusArr.push(STATUS_LOADING);
 				initializedBlogImageUrls.push({
 					url: '',
+					thumbnailUrl: '',
 					imageTitle: '',
-					imageDescription: ''
+					imageDescription: '',
+					fileIndex: i
 				});
 			}
 		}
 
 		//set state to loading so user cant submit blog twice
 		// and loading indicator appears
+		// Set loading state for thumbnails so that those start uploading
 		this.setState({
-			blogStatus: STATUS_LOADING,
-			photoStatus: STATUS_LOADING,
 			blogImagesStatusArr: initializedBlogImagesUploadStatusArr,
+			blogImagesThumbnailStatusArr: initializedBlogImagesThumbnailUploadStatusArr,
 			blogImagesUrls: initializedBlogImageUrls
 		}, () => {
-			//when we are done initializing state for upload, well...start the upload!
-			this.uploadBlog_blogImages();
+			//upload all blog images
+			for (let i = 0; i < this.state.blogImages.imgFiles.length; i++) {
+				//upload the file
+				uploadPhoto(this.state.blogImages.imgFiles[i], this.state.trip, this.state.awsS3, (err, uploadedImgData) => {
+					//error handling
+					let imgStatusArr = [...this.state.blogImagesStatusArr];
+					let imgUrlArr = [...this.state.blogImagesUrls];
+
+					if (err) {
+						console.log("Error in while uploading blog image: ", err);
+						imgStatusArr[i] = STATUS_FAILURE;
+					}
+					else {
+						//success: set status and fetch fresh list of all uploaded photos
+						imgStatusArr[i] = STATUS_SUCCESS;
+						imgUrlArr[i].url = uploadedImgData.Location;
+						imgUrlArr[i].imageTitle = this.state.blogImages.imgMetaData[i].imageTitle;
+						imgUrlArr[i].imageDescription = this.state.blogImages.imgMetaData[i].imageDescription;
+					}
+					this.setState({
+						blogImagesStatusArr: imgStatusArr,
+						blogImagesUrls: imgUrlArr
+					}, () => {
+						//if we are done loading all images check for errors
+						if (!this.state.blogImagesStatusArr.includes(STATUS_LOADING)) {
+							if (this.state.blogImagesStatusArr.includes(STATUS_FAILURE)) {
+								// Failure (in the original super smash narrator voice)
+								callback("ERROR: failure while uploading photos");
+								return;
+							}
+							if (!this.state.blogImagesStatusArr.includes(STATUS_FAILURE) && !this.state.blogImagesStatusArr.includes(STATUS_LOADING)) {
+								//if, go move forward with the uploading step
+								this.onBlogOrThumbnailImageUploaded();
+							}
+						}
+					});
+				});
+			}
 		});
 	}
 
-	//uploads all blog images (these images are optional)
-	uploadBlog_blogImages = () => {
-
-		//if no images, go ahead and upload the rest of the blog stuff
-		if (this.state.blogImages.imgFiles.length === 0) {
-			this.uploadBlog_titleImage();
-		}
-
-		//upload all blog images
-		for (let i = 0; i < this.state.blogImages.imgFiles.length; i++) {
-			//upload the file
-			uploadPhoto(this.state.blogImages.imgFiles[i], this.state.trip, this.state.awsS3, (err, uploadedImgData) => {
-				//error handling
-				let imgStatusArr = [...this.state.blogImagesStatusArr];
-				let imgUrlArr = [...this.state.blogImagesUrls];
-
-				if (err) {
-					imgStatusArr[i] = STATUS_FAILURE;
-				}
-				else {
-					//success: set status and fetch fresh list of all uploaded photos
-					imgStatusArr[i] = STATUS_SUCCESS;
-					imgUrlArr[i].url = uploadedImgData.Location;
-					imgUrlArr[i].imageTitle = this.state.blogImages.imgMetaData[i].imageTitle;
-					imgUrlArr[i].imageDescription = this.state.blogImages.imgMetaData[i].imageDescription;
-				}
-				this.setState({
-					blogImagesStatusArr: imgStatusArr,
-					blogImagesUrls: imgUrlArr
-				}, () => {
-					//if we have not failed already, go move forward with the uploading step
-					if (this.state.photoStatus === STATUS_LOADING) {
-						this.uploadBlog_titleImage();
-					}
-				});
+	onThumbnailUploadComplete = (errData, thumbnailData) => {
+		let thumbnailStatusArr = this.state.blogImagesThumbnailStatusArr;
+		let index = -1;
+		if(errData){
+			console.log("error uploading ", errData.filename, " with error ", errData.error);
+			index = errData.index;
+			thumbnailStatusArr[index] = STATUS_FAILURE;
+			this.setState({
+				blogImagesThumbnailStatusArr: thumbnailStatusArr
+			}, () => {
+				this.onBlogOrThumbnailImageUploaded();
 			});
 		}
+		else {
+			let index = thumbnailData.index;
+			let blogImagesDataArr = this.state.blogImagesUrls;
+			thumbnailStatusArr[index] = STATUS_SUCCESS;
+			blogImagesDataArr[index].thumbnailUrl = thumbnailData.url;
+			this.setState({
+				blogImagesThumbnailStatusArr: thumbnailStatusArr,
+				blogImagesUrls: blogImagesDataArr
+			}, () => {
+				this.onBlogOrThumbnailImageUploaded();
+			});
+		}
+	};
+	
+	onBlogOrThumbnailImageUploaded = () => {
+		//check that we are completely done
+		let allBlogImagesAndThumbsSuccess = true;
+		this.state.blogImagesThumbnailStatusArr.forEach(function(nextStatus) {
+			if(nextStatus !== STATUS_SUCCESS){
+				allBlogImagesAndThumbsSuccess = false;
+			}
+		});
+		  
+		this.state.blogImagesStatusArr.forEach(function(nextStatus) {
+			if(nextStatus !== STATUS_SUCCESS){
+				allBlogImagesAndThumbsSuccess = false;
+			}
+		});
+		
+		if(!allBlogImagesAndThumbsSuccess){
+			//if any raw image or its thumbnail has not succeeded do not continue with the uploading
+			return;
+		}
+
+		//if successful lets upload title image
+		this.uploadBlog_titleImage((errMsg) => {
+			if (errMsg) {
+				this.setState({
+					networkStatusErrorMesage: errMsg
+				});
+				return;
+			}
+			//if successful lets upload the rest of the blog
+			this.uploadBlog_blogData((errMsg) => {
+				if (errMsg) {
+					this.setState({
+						networkStatusErrorMesage: errMsg
+					});
+					return;
+				}
+				//We dun fam (:
+			});
+		});
 	}
 
 	//uploads the title image of the blog (title image is required)
-	uploadBlog_titleImage = () => {
+	uploadBlog_titleImage = (callback) => {
 		//check to make sure all blog images were uploaded successfully
-		for (let i = 0; i < this.state.blogImagesStatusArr.length; i++) {
-			if (this.state.blogImagesStatusArr[i] === STATUS_FAILURE) {
-				//we have failed, sad day
-				this.setState({
-					photoStatus: STATUS_FAILURE,
-					blogStatus: null
-				});
-				return;
-			}
-			if (this.state.blogImagesStatusArr[i] === STATUS_LOADING) {
-				//we are still loading blog images. 
-				return;
-			}
-		}
+		this.setState({
+			titleImgNetworkStatus: STATUS_LOADING
+		}, () => {
+			//upload photo first, then include photo location when uploading blog 
+			uploadPhoto(this.state.titleImage, this.state.trip, this.state.awsS3, (err, uploadedImageData) => {
+				//upload photo call complete
+				let photoNetworkStatus = null;
+				let photoImageUrl = null;
+				if (err) {
+					//error handling
+					photoNetworkStatus = STATUS_FAILURE;
+				}
+				else {
+					photoNetworkStatus = STATUS_SUCCESS;
+					photoImageUrl = uploadedImageData.Location
+				}
 
-		//upload photo first, then include photo location when uploading blog 
-		uploadPhoto(this.state.titleImage, this.state.trip, this.state.awsS3, (err, uploadedImageData) => {
-			////////////////////////////////
-			//upload photo call complete
-			////////////////////////////////
-			//error handling
-			if (err) {
 				this.setState({
-					photoStatus: STATUS_FAILURE,
-					blogStatus: null
+					titleImgNetworkStatus: photoNetworkStatus,
+					titleImageUrl: photoImageUrl
+				}, () => {
+					if (this.state.titleImgNetworkStatus === STATUS_FAILURE) {
+						// Failure (in the original super smash narrator voice)
+						console.log("Error in title image upload: ", err);
+						callback("Error occurred whilst uploading title image");
+					}
+					if (this.state.titleImgNetworkStatus === STATUS_SUCCESS) {
+						// WE DID IT! uploaded title photo (:
+						callback();
+					}
 				});
-				return;
-			}
-			this.setState({
-				photoStatus: STATUS_SUCCESS,
-				titleImageUrl: uploadedImageData.Location
+
 			});
-
-			this.uploadBlog_blogData();
 		});
+
 	}
 
-	uploadBlog_blogData = () => {
-		//send request with new blog entry
-		let blogdata = {
-			date: moment(this.state.date.valueOf()).unix(),
-			country: this.state.country,
-			location: this.state.location,
-			state: this.state.state,
-			title: this.state.title,
-			titleImageUrl: this.state.titleImageUrl,
-			tripId: this.state.tripId,
-			blogContent: this.state.blogtext,
-			blogImages: this.state.blogImagesUrls
-		}
-
-		uploadBlog(blogdata, (err, data) => {
-			////////////////////////////////
-			//upload blog call complete
-			////////////////////////////////
-			console.log('jeffski, blog upload complete data:', data, ' error', err);
-			if (err) {
-				this.setState({
-					blogStatus: STATUS_FAILURE,
-					photoStatus: null
-				});
-				return;
+	uploadBlog_blogData = (callback) => {
+		this.setState({
+			blogStatus: STATUS_LOADING
+		}, () => {
+			//send request with new blog entry
+			let blogdata = {
+				date: moment(this.state.date.valueOf()).unix(),
+				country: this.state.country,
+				location: this.state.location,
+				state: this.state.state,
+				title: this.state.title,
+				titleImageUrl: this.state.titleImageUrl,
+				tripId: this.state.tripId,
+				blogContent: this.state.blogtext,
+				blogImages: this.state.blogImagesUrls
 			}
-			this.setState({ blogStatus: STATUS_SUCCESS }, () => {
-				console.log('jeffski state after upload: ', this.state);
+
+			uploadBlog(blogdata, (err, data) => {
+				//upload blog call complete
+				let status = null;
+				if (err) {
+					status = STATUS_FAILURE;
+				}
+				else {
+					status = STATUS_SUCCESS;
+				}
+				this.setState({ blogStatus: status }, () => {
+					if (this.state.blogStatus === STATUS_FAILURE) {
+						console.log("Error in blog upload: ", err);
+						callback("Error whilst uploading blog info. See console for returned error");
+					}
+					if (this.state.blogStatus === STATUS_SUCCESS) {
+						callback();
+					}
+				});
 			});
 		});
-
 	}
 
 	storeBlogTextFromChildForm = (blogTextData) => {
@@ -264,12 +365,11 @@ class WriteBlog extends Component {
 
 	//returns true if the blog is ready to be submitted to the server
 	isFormSubmitAllowed() {
+		console.log('jeffski: ', this.state);
 		//form should not submit if we are currently uploading anything
-		if (this.state.blogStatus === STATUS_LOADING || this.state.photoStatus === STATUS_LOADING) {
+		if (this.state.blogStatus === STATUS_LOADING || this.state.titleImgNetworkStatus === STATUS_LOADING || this.state.blogImagesStatusArr.includes(STATUS_LOADING)) {
 			return false;
 		}
-
-		console.log('jeffski validating: ', this.state);
 		if (
 			validateFormString(this.state.country) === FORM_SUCCESS &&
 			validateDate(moment(this.state.date.valueOf()).unix()) === FORM_SUCCESS &&
@@ -298,8 +398,13 @@ class WriteBlog extends Component {
 	}
 
 	renderBlogUploadStatusMessage = () => {
-		//we upload photos first
-		if (this.state.photoStatus === STATUS_LOADING) {
+		if (this.state.blogImagesStatusArr.includes(STATUS_FAILURE) || this.state.titleImgNetworkStatus === STATUS_FAILURE || this.state.blogStatus === STATUS_FAILURE) {
+			return (
+				<div>Error Message: "{this.state.networkStatusErrorMesage}"</div>
+			)
+		}
+
+		if (this.state.blogImagesStatusArr.includes(STATUS_LOADING)) {
 			let blogPhotosInProgressCount = 0;
 			let blogPhotosSuccessCount = 0;
 			this.state.blogImagesStatusArr.forEach((nextStatus) => {
@@ -316,11 +421,11 @@ class WriteBlog extends Component {
 					<div>Uploaded {blogPhotosSuccessCount} of {this.state.blogImagesStatusArr.length}</div>
 				);
 			}
-			else {
-				return (
-					<div>Uploading Title Photo</div>
-				);
-			}
+		}
+		if (this.state.titleImgNetworkStatus === STATUS_LOADING) {
+			return (
+				<div>Uploading Title Photo</div>
+			);
 		}
 		if (this.state.blogStatus === STATUS_LOADING) {
 			return (
@@ -329,6 +434,19 @@ class WriteBlog extends Component {
 		}
 		return null;
 	}
+
+	onTripSelected = (tripInfoReturned) => {
+		//if location is empty default to the trips location
+		let location = this.state.location;
+		if (!location || location === '') {
+			location = tripInfoReturned.location;
+		}
+		this.setState({
+			trip: tripInfoReturned.name,
+			tripId: tripInfoReturned.id,
+			location: location
+		});
+	};
 
 	render() {
 		return (
@@ -345,12 +463,7 @@ class WriteBlog extends Component {
 					<div className="tripSelectFormSection">
 						<TripsDropdown
 							sortAlphabetically={false}
-							onTripReturned={(tripInfoReturned) => {
-								this.setState({
-									trip: tripInfoReturned.name,
-									tripId: tripInfoReturned.id
-								});
-							}} />
+							onTripReturned={this.onTripSelected} />
 					</div>
 					<FormGroup
 						controlId="tripFormInput"
@@ -461,14 +574,19 @@ class WriteBlog extends Component {
 						Upload Blog
           			</Button>
 					<div>
-						{(this.state.blogStatus === STATUS_LOADING || this.state.photoStatus === STATUS_LOADING)
+						{(this.state.blogStatus === STATUS_LOADING || this.state.titleImgNetworkStatus === STATUS_LOADING || this.state.blogImagesStatusArr.includes(STATUS_LOADING))
 							&& <CircularProgress />}
-						{(this.state.blogStatus === STATUS_SUCCESS && this.state.photoStatus === STATUS_SUCCESS)
+						{(this.state.blogStatus === STATUS_SUCCESS && this.state.titleImgNetworkStatus === STATUS_SUCCESS && !this.state.blogImagesStatusArr.includes(STATUS_FAILURE) && !this.state.blogImagesStatusArr.includes(STATUS_LOADING))
 							&& <Indicator success={true} />}
-						{(this.state.blogStatus === STATUS_FAILURE || this.state.photoStatus === STATUS_FAILURE)
+						{(this.state.blogStatus === STATUS_FAILURE || this.state.titleImgNetworkStatus === STATUS_FAILURE || this.state.blogImagesStatusArr.includes(STATUS_FAILURE))
 							&& <Indicator success={false} />}
 						{this.renderBlogUploadStatusMessage()}
 					</div>
+					{this.state.blogImages.imgFiles && this.state.blogImagesThumbnailStatusArr.includes(STATUS_LOADING) &&
+						<ResizeImg filesToThumbAndUpload={this.state.blogImages.imgFiles}
+							onPhotoFinished={this.onThumbnailUploadComplete}
+						/>
+					}
 				</ButtonToolbar>
 			</div>
 		);

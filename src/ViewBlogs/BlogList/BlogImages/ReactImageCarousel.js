@@ -10,8 +10,8 @@ class ReactImageCarousel extends React.Component {
 
         images.map((nextImageItem)=>{
             imageUrls.push({
-                original: nextImageItem,
-                thumbnail: nextImageItem
+                original: nextImageItem.rawUrl,
+                thumbnail: nextImageItem.thumbUrl
             });
         })
         console.log('jeffski in ReactImageCarousel: ', imageUrls);
@@ -26,6 +26,11 @@ class ReactImageCarousel extends React.Component {
 
 ReactImageCarousel.propTypes = {
     images: PropTypes.array.isRequired
+    // array of image data:
+    // {
+    //   rawUrl: string
+    //   thumbUrl: string
+    // }
 }
 
 export default ReactImageCarousel;

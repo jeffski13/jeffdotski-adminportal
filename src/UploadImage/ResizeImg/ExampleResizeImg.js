@@ -24,7 +24,7 @@ export default class ExampleResizeImg extends React.Component {
         });
     };
 
-    onThumbnailSuccess = (errData, thumbnailData) => {
+    onThumbnailUploadComplete = (errData, thumbnailData) => {
         if(errData){
             console.log("error uploading ", errData.filename, " with error ", errData.error);
             this.setState({
@@ -75,7 +75,7 @@ export default class ExampleResizeImg extends React.Component {
                 </FormGroup>
                 {this.state.imageFiles && 
                     <ResizeImg  filesToThumbAndUpload={this.state.imageFiles}
-                        onPhotoFinished={this.onThumbnailSuccess}
+                        onPhotoFinished={this.onThumbnailUploadComplete}
                     />
                 }
                 {this.state.thumbnailDataReturned.map(this.renderReturnedUrls)}

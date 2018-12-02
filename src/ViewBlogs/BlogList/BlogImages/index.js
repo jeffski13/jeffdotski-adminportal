@@ -61,7 +61,10 @@ class BlogImages extends React.Component {
 
         let images = [];
         this.props.blogImageData.forEach(nextBlogImageData => {
-            images.push(nextBlogImageData.url);
+            images.push({
+                rawUrl: nextBlogImageData.url,
+                thumbUrl: nextBlogImageData.thumbnailUrl
+            });
         });
 
         console.log('jeffski images', images);
@@ -70,29 +73,6 @@ class BlogImages extends React.Component {
         if (this.state.width <= 650) {
             isMobile = true;
         }
-
-        // images = [
-        //     {
-        //         url: "http://i.imgur.com/37w80TG.jpg",
-        //         imageTitle: "title",
-        //         imageDescription: "descski"
-        //     },
-        //     {
-        //         url: "http://i.imgur.com/tI5jq2c.jpg",
-        //         imageTitle: "title",
-        //         imageDescription: "descski"
-        //     },
-        //     {
-        //         url: "http://i.imgur.com/B1MCOtx.jpg",
-        //         imageTitle: "title",
-        //         imageDescription: "descski"
-        //     },
-        //     {
-        //         url: "http://i.imgur.com/37w80TG.jpg",
-        //         imageTitle: "title",
-        //         imageDescription: "descski"
-        //     }
-        // ]
 
         if (isMobile) {
             console.log('jeffski rendering mobile images');

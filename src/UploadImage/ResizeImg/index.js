@@ -13,9 +13,15 @@ export default class ResizeImg extends React.Component {
         onPhotoFinished: PropTypes.func
     };
 
-    //default onTripsReturned to empty function to avoid crash
+    //default to empty functions to avoid crash
     static defaultProps = {
-        onPhotoFinished: (err, uploadedData) => { }
+        // uploadedThumbnailData will be an array with these objects:
+        // {
+        //   filename: string, 
+        //   url: string, 
+        //   index: number
+        // }
+        onPhotoFinished: (err, uploadedThumbnailData) => { }
     };
 
     constructor(props) {
@@ -77,6 +83,7 @@ export default class ResizeImg extends React.Component {
                     var resizedCanvas = document.createElement('canvas');
                     var img = new Image();
                     img.src = event.target.result;
+                    // need reference to parentreactComponent because we cant bind this (need this of the img.onload to get height and width)
                     var parentReactComponent = this;
                     img.onload = function () {
             
