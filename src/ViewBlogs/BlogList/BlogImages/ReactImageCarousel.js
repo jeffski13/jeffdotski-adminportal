@@ -14,7 +14,6 @@ class ReactImageCarousel extends React.Component {
                 thumbnail: nextImageItem.thumbUrl
             });
         })
-        console.log('jeffski in ReactImageCarousel: ', imageUrls);
         return (
             <div>
                 React Image Carousel

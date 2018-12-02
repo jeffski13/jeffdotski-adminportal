@@ -36,8 +36,6 @@ class BlogImages extends React.Component {
     };
 
     renderBlogImageItems = (blogImageItemData, index) => {
-        console.log('jeffski rendering mobile blog images Item: ', blogImageItemData);
-
         return (
             <div className="BlogImages-mobile-responsive-images" >
                 <Image
@@ -55,7 +53,6 @@ class BlogImages extends React.Component {
 
         //make sure blog images exist. If not, dont render a darn thing
         if (!this.props.blogImageData || this.props.blogImageData.length === 0) {
-            console.log('jeffski rendering blogimage: no images > Null');
             return null;
         }
 
@@ -67,7 +64,6 @@ class BlogImages extends React.Component {
             });
         });
 
-        console.log('jeffski images', images);
         //is it time to go mobile?
         let isMobile = false;
         if (this.state.width <= 650) {
@@ -75,7 +71,6 @@ class BlogImages extends React.Component {
         }
 
         if (isMobile) {
-            console.log('jeffski rendering mobile images');
             return (
                 <React.Fragment>
                     <div className="BlogImages-top-spacer" />

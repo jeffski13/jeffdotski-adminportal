@@ -9,7 +9,6 @@ import { AWS_S3_BUCKET_NAME } from '../configski';
  * @param {function} callback - (error, data) - function with error/data information from s3
  */
 export function uploadPhoto(file, tripName, awsS3client, callback) {
-    console.log('jeffski: file uploading ', file, tripName);
     let fileName = file.name;
     let blogImageUploadKey = `blog/${tripName}/${fileName}`;
 

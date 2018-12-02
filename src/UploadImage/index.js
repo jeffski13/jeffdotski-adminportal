@@ -54,7 +54,7 @@ class UploadImage extends React.Component {
 
         fetchBlogObjects(this.state.awsS3, (err, allBlogS3Ojectes) => {
             if (err) {
-                console.log('jeffski upload photos err on fetch', err);
+                console.log('Upload photos err on fetch', err);
                 this.setState({ 
                     statusMessage: 'Error',
                     status: STATUS_FAILURE 

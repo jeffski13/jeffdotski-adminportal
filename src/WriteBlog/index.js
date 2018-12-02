@@ -365,7 +365,6 @@ class WriteBlog extends Component {
 
 	//returns true if the blog is ready to be submitted to the server
 	isFormSubmitAllowed() {
-		console.log('jeffski: ', this.state);
 		//form should not submit if we are currently uploading anything
 		if (this.state.blogStatus === STATUS_LOADING || this.state.titleImgNetworkStatus === STATUS_LOADING || this.state.blogImagesStatusArr.includes(STATUS_LOADING)) {
 			return false;
