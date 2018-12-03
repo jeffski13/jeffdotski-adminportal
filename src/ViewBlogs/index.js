@@ -58,11 +58,11 @@ class ViewBlogs extends Component {
 					return;
 				}
 
-				data.sort((a,b) => {
-					if (a.date < b.date){
+				data.sort((trip,nextTrip) => {
+					if (trip.date < nextTrip.date){
 						return 1;
 					}
-					if (a.date > b.date){
+					if (trip.date > nextTrip.date){
 						return -1;
 					}
 					return 0;
