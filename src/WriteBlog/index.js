@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { FormGroup, ControlLabel, FormControl, ButtonToolbar, Button } from 'react-bootstrap';
+import { FormGroup, ControlLabel, FormControl, ButtonToolbar, Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CircularProgress from 'material-ui/Progress/CircularProgress';
 import moment from 'moment';
+import { Prompt } from 'react-router-dom';
 
 import { validateFormString, validateDate, FORM_SUCCESS } from '../formvalidation';
 import BlogEntryFormGenerator from './BlogEntryFormGenerator';
@@ -13,17 +14,39 @@ import { AWS_S3_REGION, AWS_IDENTITY_POOL_ID_AWS_ACCESS } from '../configski';
 import { uploadPhoto } from '../aws/photo';
 import { uploadBlog } from '../aws/blog';
 import { getTrips } from '../aws/trips';
-import './styles.css';
 import Indicator from '../aws/Indicator';
-import Completeit from './Completeit';
 import TripsDropdown from '../Trips/TripsDropdown';
-import { fail } from 'assert';
-import ResizeImg from '../UploadImage/ResizeImg'
+import ResizeImg from '../UploadImage/ResizeImg';
+import { secondsPerHour } from './date-consts';
+import './styles.css';
 
 //statuses for all the things (blog images, title image, blog data) we will be uploading to the server
 const STATUS_SUCCESS = 'STATUS_SUCCESS';
 const STATUS_FAILURE = 'STATUS_FAILURE';
 const STATUS_LOADING = 'STATUS_LOADING';
+
+const timeOfDayArr = [
+	{
+		name: 'Morning',
+		hour: 8,
+		readableTime: '8:00 am'
+	},
+	{
+		name: 'Afternoon',
+		hour: 12,
+		readableTime: '12:00 pm'
+	},
+	{
+		name: 'Evening',
+		hour: 18,
+		readableTime: '6:00 pm'
+	},
+	{
+		name: 'Night',
+		hour: 22,
+		readableTime: '10:00 pm'
+	}
+];
 
 /*
 parent/master class for writing a blog.
@@ -45,16 +68,17 @@ class WriteBlog extends Component {
 		let s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 		this.state = {
-			trip: 'Journey With Jesus',
+			trip: 'Jesus',
 			tripId: '98d67740-f43b-11e8-8f4f-15e76e2a2611',
-			country: 'Merica',
+			country: 'USA',
 			state: 'TX',
-			location: 'ze nest',
+			location: 'localle',
 			date: moment().startOf('day'),
-			title: 'Started from Oklahoma, now i here',
+			timeOfDaySelected: null,
+			title: 'title9',
 			titleImage: {},
 			titleImageUrl: null,
-			blogtext: [{ text: "yoloswag" }],
+			blogtext: [],
 			blogImages: {
 				imgFiles: []
 			},
@@ -141,7 +165,7 @@ class WriteBlog extends Component {
 
 		//if no images we are all done here!
 		if (this.state.blogImages.imgFiles.length === 0) {
-			callback(null);
+			this.onBlogOrThumbnailImageUploaded();
 		}
 
 		//initialize variables for loading progress
@@ -215,7 +239,7 @@ class WriteBlog extends Component {
 	onThumbnailUploadComplete = (errData, thumbnailData) => {
 		let thumbnailStatusArr = this.state.blogImagesThumbnailStatusArr;
 		let index = -1;
-		if(errData){
+		if (errData) {
 			console.log("error uploading ", errData.filename, " with error ", errData.error);
 			index = errData.index;
 			thumbnailStatusArr[index] = STATUS_FAILURE;
@@ -238,23 +262,23 @@ class WriteBlog extends Component {
 			});
 		}
 	};
-	
+
 	onBlogOrThumbnailImageUploaded = () => {
 		//check that we are completely done
 		let allBlogImagesAndThumbsSuccess = true;
-		this.state.blogImagesThumbnailStatusArr.forEach(function(nextStatus) {
-			if(nextStatus !== STATUS_SUCCESS){
+		this.state.blogImagesThumbnailStatusArr.forEach(function (nextStatus) {
+			if (nextStatus !== STATUS_SUCCESS) {
 				allBlogImagesAndThumbsSuccess = false;
 			}
 		});
-		  
-		this.state.blogImagesStatusArr.forEach(function(nextStatus) {
-			if(nextStatus !== STATUS_SUCCESS){
+
+		this.state.blogImagesStatusArr.forEach(function (nextStatus) {
+			if (nextStatus !== STATUS_SUCCESS) {
 				allBlogImagesAndThumbsSuccess = false;
 			}
 		});
-		
-		if(!allBlogImagesAndThumbsSuccess){
+
+		if (!allBlogImagesAndThumbsSuccess) {
 			//if any raw image or its thumbnail has not succeeded do not continue with the uploading
 			return;
 		}
@@ -324,9 +348,19 @@ class WriteBlog extends Component {
 		this.setState({
 			blogStatus: STATUS_LOADING
 		}, () => {
+			let blogDate = this.state.date;
+			if (moment(blogDate.valueOf()).unix() === moment(moment().startOf('day').valueOf()).unix()) {
+				// if they chose today, just use the time exactly right now (we assume we are not creating a blog from earlier today)
+				blogDate = moment();
+			}
+			blogDate = moment(blogDate.valueOf()).unix();
+			if (moment(this.state.date.valueOf()).unix() !== moment(moment().startOf('day').valueOf()).unix() && this.state.timeOfDaySelected) {
+				// if they chose anything BUT today, add on the time selected option
+				blogDate = blogDate + this.state.timeOfDaySelected.hour * secondsPerHour;
+			}
 			//send request with new blog entry
 			let blogdata = {
-				date: moment(this.state.date.valueOf()).unix(),
+				date: blogDate,
 				country: this.state.country,
 				location: this.state.location,
 				state: this.state.state,
@@ -379,6 +413,13 @@ class WriteBlog extends Component {
 			this.state.titleImage && validateFormString(this.state.titleImage.name) === FORM_SUCCESS &&
 			this.state.blogtext && this.state.blogtext.length > 0
 		) {
+			return true;
+		}
+		return false;
+	}
+
+	isFormEditAllowed = () => {
+		if (this.state.blogStatus !== STATUS_LOADING && this.state.titleImgNetworkStatus !== STATUS_LOADING && !this.state.blogImagesStatusArr.includes(STATUS_LOADING) && !this.state.blogImagesThumbnailStatusArr.includes(STATUS_LOADING)) {
 			return true;
 		}
 		return false;
@@ -447,18 +488,67 @@ class WriteBlog extends Component {
 		});
 	};
 
+	renderTimeOfDayOptions = (nextTime, index) => {
+		return (
+			<MenuItem
+				key={`${index}-${nextTime.name}`}
+				eventKey={index}
+				onSelect={() => {
+					this.setState({
+						timeOfDaySelected: nextTime
+					});
+				}}
+			>
+				{nextTime.name}
+			</MenuItem>
+		);
+	};
+
+	handleUserLeavingBlogForm = (ev) => {
+		ev.preventDefault();
+		return ev.returnValue = 'Are you sure you want to close?';
+	};
+
 	render() {
+		let timeOfDayDropdown = null;
+		//on any day except today, give the user a dropdown to choose a time of day 
+		if (moment(this.state.date.valueOf()).unix() !== moment(moment().startOf('day').valueOf()).unix()) {
+			let timeOfDaySelected = "Selected Time of Day";
+			if (this.state.timeOfDaySelected && this.state.timeOfDaySelected) {
+				timeOfDaySelected = this.state.timeOfDaySelected.name;
+			}
+			timeOfDayDropdown = (
+				<DropdownButton
+					title={timeOfDaySelected}
+					disabled={!this.isFormEditAllowed()}
+				>
+					{timeOfDayArr.map(this.renderTimeOfDayOptions)}
+				</DropdownButton>
+			);
+		}
+
+		if (this.state.blogtext.length > 0 || this.state.title.length > 0) {
+			window.addEventListener("beforeunload", this.handleUserLeavingBlogForm);
+		}
+		else {
+			window.removeEventListener('beforeunload', this.handleUserLeavingBlogForm);
+		}
+
 		return (
 			<div className="WriteBlog">
+
 				{/* minimum information required for blog (trip, title, date, location) */}
 				<div className="form-group">
 					<DatePicker
 						selected={this.state.date}
 						onChange={this.handleDateChange}
 						className="form-control"
+						disabled={!this.isFormEditAllowed()}
 					/>
+					{timeOfDayDropdown}
 				</div>
 				<form>
+				
 					<div className="tripSelectFormSection">
 						<TripsDropdown
 							sortAlphabetically={false}
@@ -485,6 +575,7 @@ class WriteBlog extends Component {
 							value={this.state.country}
 							placeholder="Enter an Earth Country (Other worlds not yet supported)"
 							onChange={this.handleCountryChange}
+							disabled={!this.isFormEditAllowed()}
 						/>
 						<FormControl.Feedback />
 					</FormGroup>
@@ -499,6 +590,7 @@ class WriteBlog extends Component {
 							value={this.state.state}
 							placeholder="Enter a State/Region Name"
 							onChange={this.handleStateChange}
+							disabled={!this.isFormEditAllowed()}
 						/>
 						<FormControl.Feedback />
 					</FormGroup>
@@ -513,6 +605,7 @@ class WriteBlog extends Component {
 							value={this.state.location}
 							placeholder="Enter text"
 							onChange={this.handleLocationChange}
+							disabled={!this.isFormEditAllowed()}
 						/>
 						<FormControl.Feedback />
 					</FormGroup>
@@ -526,6 +619,7 @@ class WriteBlog extends Component {
 							value={this.state.title}
 							placeholder="Enter text"
 							onChange={this.handleTitleChange}
+							disabled={!this.isFormEditAllowed()}
 						/>
 						<FormControl.Feedback />
 					</FormGroup>
@@ -537,6 +631,7 @@ class WriteBlog extends Component {
 						<ControlLabel>Title Image</ControlLabel>
 						<div className="WriteBlog__file_details" >
 							<FormControl
+								disabled={!this.isFormEditAllowed()}
 								type="file"
 								placeholder="Choose Image File"
 								onChange={this.handleImgFileChange}
