@@ -30,7 +30,7 @@ export default class BlogList extends React.Component {
         }
 
         return (
-            <div className="blog" key={blogItem.date}>
+            <div className="blog" key={blogItem.createdAtDate}>
                 <div>Title: {blogItem.title}</div>
                 <div>Location: {blogItem.location}</div>
                 {blogItem.state && <div>State: {blogItem.state}</div>}
