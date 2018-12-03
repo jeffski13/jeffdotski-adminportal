@@ -478,13 +478,25 @@ class WriteBlog extends Component {
 	onTripSelected = (tripInfoReturned) => {
 		//if location is empty default to the trips location
 		let location = this.state.location;
+		let state = this.state.state;
+		let country = this.state.country;
+		
 		if (!location || location === '') {
 			location = tripInfoReturned.location;
 		}
+		if (!state || state === '') {
+			state = tripInfoReturned.state;
+		}
+		if (!country || country === '') {
+			country = tripInfoReturned.country;
+		}
+
 		this.setState({
 			trip: tripInfoReturned.name,
 			tripId: tripInfoReturned.id,
-			location: location
+			location: location,
+			state: state,
+			country: country
 		});
 	};
 

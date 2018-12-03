@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormControl, ControlLabel, FormGroup, DropdownButton, MenuItem, ButtonToolbar, Button } from 'react-bootstrap';
+import { FormControl, ControlLabel, FormGroup, Col, ButtonToolbar, Button, Form } from 'react-bootstrap';
 import Indicator from '../aws/Indicator';
 import CircularProgress from 'material-ui/Progress/CircularProgress';
 
@@ -25,6 +25,8 @@ export default class Trips extends React.Component {
             tripCreation: {
                 location: '',
                 name: '',
+                country: '',
+                state: '',
                 year: 0,
                 month: 0
             }
@@ -130,109 +132,154 @@ export default class Trips extends React.Component {
 
                 <div className="createTripForm">
                     <h3>Create A New Trip</h3>
-                    <FormGroup
-                        controlId="nameFormInput"
-                        validationState={validateFormString(this.state.tripCreation.name)}
-                    >
-                        <ControlLabel>Name</ControlLabel>
-                        <FormControl
-                            type="text"
-                            value={this.state.tripCreation.name}
-                            placeholder="Enter text"
-                            onChange={(e) => {
-                                this.setState({
-                                    tripCreation: {
-                                        ...this.state.tripCreation,
-                                        name: e.target.value
-                                    }
-                                });
-                            }}
-                        />
-                        <FormControl.Feedback />
-                    </FormGroup>
-                    <FormGroup
-                        controlId="locationFormInput"
-                        validationState={validateFormString(this.state.tripCreation.location)}
-                    >
-                        <ControlLabel>Location</ControlLabel>
-                        <FormControl
-                            type="text"
-                            value={this.state.tripCreation.location}
-                            placeholder="Enter text"
-                            onChange={(e) => {
-                                this.setState({
-                                    tripCreation: {
-                                        ...this.state.tripCreation,
-                                        location: e.target.value
-                                    }
-                                });
-                            }}
-                        />
-                        <FormControl.Feedback />
-                    </FormGroup>
-                    <FormGroup
-                        controlId="yearFormInput"
-                        validationState={validateFormPositiveNumber(this.state.tripCreation.year)}
-                    >
-                        <ControlLabel>Year</ControlLabel>
-                        <FormControl
-                            type="text"
-                            value={this.state.tripCreation.year}
-                            placeholder="Enter text"
-                            onChange={(e) => {
-                                this.setState({
-                                    tripCreation: {
-                                        ...this.state.tripCreation,
-                                        year: e.target.value
-                                    }
-                                });
-                            }}
-                        />
-                        <FormControl.Feedback />
-                    </FormGroup>
-                    <FormGroup
-                        controlId="monthFormInput"
-                        validationState={validateFormPositiveNumber(this.state.tripCreation.month)}
-                    >
-                        <ControlLabel>Month</ControlLabel>
-                        <FormControl
-                            type="text"
-                            value={this.state.tripCreation.month}
-                            placeholder="Enter text"
-                            onChange={(e) => {
-                                this.setState({
-                                    tripCreation: {
-                                        ...this.state.tripCreation,
-                                        month: e.target.value
-                                    }
-                                });
-                            }}
-                        />
-                        <FormControl.Feedback />
-                    </FormGroup>
+                    <form>
 
-                    {/* submit button with network status indicators */}
-                    <ButtonToolbar>
-                        <Button
-                            bsStyle="primary"
-                            bsSize="large"
-                            onClick={this.onCreatTripClicked}
-                            disabled={!this.isFormSubmitAllowed()}
+                        <FormGroup
+                            controlId="nameFormInput"
+                            validationState={validateFormString(this.state.tripCreation.name)}
                         >
-                            Create Trip
-          			</Button>
-                        <div>
-                            {(this.state.createTripStatus === STATUS_LOADING)
-                                && <CircularProgress />}
-                            {(this.state.createTripStatus === STATUS_SUCCESS)
-                                && <Indicator success={true} />}
-                            {(this.state.createTripStatus === STATUS_FAILURE)
-                                && <Indicator success={false} />}
-                        </div>
-                    </ButtonToolbar>
-                    {tripCreationServerMessage}
-                </div>
+                            <ControlLabel>Name</ControlLabel>
+                            <FormControl
+                                type="text"
+                                value={this.state.tripCreation.name}
+                                placeholder="Enter text"
+                                onChange={(e) => {
+                                    this.setState({
+                                        tripCreation: {
+                                            ...this.state.tripCreation,
+                                            name: e.target.value
+                                        }
+                                    });
+                                }}
+                            />
+                            <FormControl.Feedback />
+                        </FormGroup>
 
+                        <FormGroup
+                            controlId="locationFormInput"
+                            validationState={validateFormString(this.state.tripCreation.location)}
+                        >
+                            <ControlLabel>Location</ControlLabel>
+                            <FormControl
+                                type="text"
+                                value={this.state.tripCreation.location}
+                                placeholder="Enter text"
+                                onChange={(e) => {
+                                    this.setState({
+                                        tripCreation: {
+                                            ...this.state.tripCreation,
+                                            location: e.target.value
+                                        }
+                                    });
+                                }}
+                            />
+                            <FormControl.Feedback />
+                        </FormGroup>
+
+                        <FormGroup
+                            controlId="locationFormInput"
+                        >
+                            <ControlLabel>Country</ControlLabel>
+                            <FormControl
+                                type="text"
+                                value={this.state.tripCreation.country}
+                                placeholder="Country"
+                                onChange={(e) => {
+                                    this.setState({
+                                        tripCreation: {
+                                            ...this.state.tripCreation,
+                                            country: e.target.value
+                                        }
+                                    });
+                                }}
+                            />
+                            <FormControl.Feedback />
+                        </FormGroup>
+
+                        <FormGroup
+                            controlId="locationFormInput"
+                        >
+                            <ControlLabel>State/Region</ControlLabel>
+                            <FormControl
+                                type="text"
+                                value={this.state.tripCreation.state}
+                                placeholder="Enter text"
+                                onChange={(e) => {
+                                    this.setState({
+                                        tripCreation: {
+                                            ...this.state.tripCreation,
+                                            state: e.target.value
+                                        }
+                                    });
+                                }}
+                            />
+                            <FormControl.Feedback />
+                        </FormGroup>
+
+                        <FormGroup
+                            controlId="yearFormInput"
+                            validationState={validateFormPositiveNumber(this.state.tripCreation.year)}
+                        >
+                            <ControlLabel>Year</ControlLabel>
+                            <FormControl
+                                type="text"
+                                value={this.state.tripCreation.year}
+                                placeholder="Enter text"
+                                onChange={(e) => {
+                                    this.setState({
+                                        tripCreation: {
+                                            ...this.state.tripCreation,
+                                            year: e.target.value
+                                        }
+                                    });
+                                }}
+                            />
+                            <FormControl.Feedback />
+                        </FormGroup>
+                        <FormGroup
+                            controlId="monthFormInput"
+                            validationState={validateFormPositiveNumber(this.state.tripCreation.month)}
+                        >
+                            <ControlLabel>Month</ControlLabel>
+                            <FormControl
+                                type="text"
+                                value={this.state.tripCreation.month}
+                                placeholder="Enter text"
+                                onChange={(e) => {
+                                    this.setState({
+                                        tripCreation: {
+                                            ...this.state.tripCreation,
+                                            month: e.target.value
+                                        }
+                                    });
+                                }}
+                            />
+                            <FormControl.Feedback />
+                        </FormGroup>
+
+                        {/* submit button with network status indicators */}
+                        <ButtonToolbar>
+                            <Button
+                                bsStyle="primary"
+                                bsSize="large"
+                                onClick={this.onCreatTripClicked}
+                                disabled={!this.isFormSubmitAllowed()}
+                            >
+                                Create Trip
+          			</Button>
+                            <div>
+                                {(this.state.createTripStatus === STATUS_LOADING)
+                                    && <CircularProgress />}
+                                {(this.state.createTripStatus === STATUS_SUCCESS)
+                                    && <Indicator success={true} />}
+                                {(this.state.createTripStatus === STATUS_FAILURE)
+                                    && <Indicator success={false} />}
+                            </div>
+                        </ButtonToolbar>
+                        {tripCreationServerMessage}
+
+                    </form>
+                </div>
             </div>
         );
     }
