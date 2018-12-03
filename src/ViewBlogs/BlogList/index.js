@@ -24,7 +24,6 @@ export default class BlogList extends React.Component {
     //render each blog here
     // show Title, Location, Date, and 
     renderBlogItem = (blogItem, index) => {
-
         if (!blogItem) {
             return null;
         }

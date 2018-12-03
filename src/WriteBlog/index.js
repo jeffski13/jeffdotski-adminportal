@@ -68,14 +68,14 @@ class WriteBlog extends Component {
 		let s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 		this.state = {
-			trip: 'Jesus',
-			tripId: '98d67740-f43b-11e8-8f4f-15e76e2a2611',
-			country: 'USA',
-			state: 'TX',
-			location: 'localle',
+			trip: '',
+			tripId: null,
+			country: '',
+			state: '',
+			location: '',
 			date: moment().startOf('day'),
 			timeOfDaySelected: null,
-			title: 'title9',
+			title: '',
 			titleImage: {},
 			titleImageUrl: null,
 			blogtext: [],
@@ -643,11 +643,6 @@ class WriteBlog extends Component {
 					</FormGroup>
 				</form>
 
-				{/*form where you can dynamically create blog content (paragraphs, bullet list, etc.) */}
-				<BlogEntryFormGenerator
-					getBlogTextData={(data) => { this.storeBlogTextFromChildForm(data) }}
-				/>
-
 				{/* insert carousel here */}
 				<ImageCarousel
 					imageSelectedCallback={(imgData) => {
@@ -657,6 +652,11 @@ class WriteBlog extends Component {
 					}}
 				/>
 
+				{/*form where you can dynamically create blog content (paragraphs, bullet list, etc.) */}
+				<BlogEntryFormGenerator
+					getBlogTextData={(data) => { this.storeBlogTextFromChildForm(data) }}
+				/>
+				
 				{/* submit button with network status indicators */}
 				<ButtonToolbar>
 					<Button
