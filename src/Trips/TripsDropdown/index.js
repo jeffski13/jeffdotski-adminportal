@@ -15,7 +15,9 @@ export default class TripsDropdown extends React.Component {
         onTripSelected: PropTypes.func,
         onTripsReturned: PropTypes.func,
         // if false, will sort by date
-        sortAlphabetically: PropTypes.bool
+        sortAlphabetically: PropTypes.bool,
+        //refresh counter: could be anything just needs to change to refresh
+        refreshProp: PropTypes.number
     };
 
     //default onTripsReturned to empty function to avoid crash
@@ -35,8 +37,28 @@ export default class TripsDropdown extends React.Component {
                 code: null
             },
             availableTrips: [],
-            tripInfo: null
+            tripInfo: null,
+            tripIndexSelected: -1
         };
+    }
+
+    componentDidUpdate(prevProps) {
+        //wipe out our data on refresh update
+        if (this.props.refreshProp !== prevProps.refreshProp) {
+            this.setState({
+                getTripsStatus: null,
+                getTripResults: {
+                    status: null,
+                    message: null,
+                    code: null
+                },
+                availableTrips: [],
+                tripInfo: null,
+                tripIndexSelected: -1
+            }, () => {
+                this.getTrips();
+            });
+        }
     }
 
     componentDidMount() {
@@ -72,10 +94,10 @@ export default class TripsDropdown extends React.Component {
                     return 0;
                 });
             }
-            else{
+            else {
                 tripData.sort(function (tripA, tripB) {
-                    var tripADate = tripA.year + (tripA.month/100);
-                    var tripBDate = tripB.year + (tripB.month/100);
+                    var tripADate = tripA.year + (tripA.month / 100);
+                    var tripBDate = tripB.year + (tripB.month / 100);
                     if (tripADate > tripBDate) { return -1; }
                     if (tripADate < tripBDate) { return 1; }
                     return 0;

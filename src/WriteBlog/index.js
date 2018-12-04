@@ -89,7 +89,8 @@ class WriteBlog extends Component {
 			blogStatus: null, //status for blog data
 			networkStatusErrorMesage: '',
 			awsS3: s3,
-			availableTrips: []
+			availableTrips: [],
+			formRefreshProp: false
 		};
 	}
 
@@ -375,20 +376,29 @@ class WriteBlog extends Component {
 				//upload blog call complete
 				let status = null;
 				if (err) {
-					status = STATUS_FAILURE;
+					this.setState({ blogStatus: STATUS_FAILURE });
+					console.log("Error in blog upload: ", err);
+					callback("Error whilst uploading blog info. See console for returned error");
+					return;
 				}
 				else {
-					status = STATUS_SUCCESS;
+					//You freakin did it man.
+					// clear this stuff out and lets go home
+					let refreshProp = !this.state.formRefreshProp;
+					this.setState({
+						blogStatus: STATUS_SUCCESS,
+						title: '',
+						titleImage: {},
+						titleImageUrl: null,
+						blogtext: [],
+						blogImages: {
+							imgFiles: []
+						},
+						formRefreshProp: refreshProp
+					});
+					callback();
 				}
-				this.setState({ blogStatus: status }, () => {
-					if (this.state.blogStatus === STATUS_FAILURE) {
-						console.log("Error in blog upload: ", err);
-						callback("Error whilst uploading blog info. See console for returned error");
-					}
-					if (this.state.blogStatus === STATUS_SUCCESS) {
-						callback();
-					}
-				});
+				
 			});
 		});
 	}
@@ -480,7 +490,7 @@ class WriteBlog extends Component {
 		let location = this.state.location;
 		let state = this.state.state;
 		let country = this.state.country;
-		
+
 		if (!location || location === '') {
 			location = tripInfoReturned.location;
 		}
@@ -560,7 +570,7 @@ class WriteBlog extends Component {
 					{timeOfDayDropdown}
 				</div>
 				<form>
-				
+
 					<div className="tripSelectFormSection">
 						<TripsDropdown
 							sortAlphabetically={false}
@@ -666,9 +676,10 @@ class WriteBlog extends Component {
 
 				{/*form where you can dynamically create blog content (paragraphs, bullet list, etc.) */}
 				<BlogEntryFormGenerator
-					getBlogTextData={(data) => { this.storeBlogTextFromChildForm(data) }}
+					getBlogTextData={(data) => { this.storeBlogTextFromChildForm(data)}}
+					refreshProp={this.state.formRefreshProp}
 				/>
-				
+
 				{/* submit button with network status indicators */}
 				<ButtonToolbar>
 					<Button
