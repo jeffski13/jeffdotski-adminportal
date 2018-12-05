@@ -20,7 +20,7 @@ export default class BlogEntryFormGenerator extends React.Component {
         //callback with data parameter which will execute when blog data has been obtained
         getBlogTextData: PropTypes.func,
         //refresh counter: could be anything just needs to change to refresh
-        refreshProp: PropTypes.number
+        refreshProp: PropTypes.any
     };
 
     constructor(props) {

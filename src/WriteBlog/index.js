@@ -27,6 +27,11 @@ const STATUS_LOADING = 'STATUS_LOADING';
 
 const timeOfDayArr = [
 	{
+		name: 'None',
+		hour: 0,
+		readableTime: '0:00 am'
+	},
+	{
 		name: 'Morning',
 		hour: 8,
 		readableTime: '8:00 am'
@@ -141,7 +146,12 @@ class WriteBlog extends Component {
 	}
 
 	handleImgFileChange = (e) => {
-		this.setState({ titleImage: e.target.files[0] });
+		if(e.target.files.length > 0){
+			this.setState({ titleImage: e.target.files[0] });
+		}
+		else {
+			this.setState({ titleImage: {} });
+		}
 	}
 
 	//upload photo/blog to server
@@ -388,6 +398,7 @@ class WriteBlog extends Component {
 					this.setState({
 						blogStatus: STATUS_SUCCESS,
 						title: '',
+						location: '',
 						titleImage: {},
 						titleImageUrl: null,
 						blogtext: [],
@@ -487,13 +498,9 @@ class WriteBlog extends Component {
 
 	onTripSelected = (tripInfoReturned) => {
 		//if location is empty default to the trips location
-		let location = this.state.location;
 		let state = this.state.state;
 		let country = this.state.country;
 
-		if (!location || location === '') {
-			location = tripInfoReturned.location;
-		}
 		if (!state || state === '') {
 			state = tripInfoReturned.state;
 		}
@@ -504,7 +511,6 @@ class WriteBlog extends Component {
 		this.setState({
 			trip: tripInfoReturned.name,
 			tripId: tripInfoReturned.id,
-			location: location,
 			state: state,
 			country: country
 		});
@@ -536,7 +542,7 @@ class WriteBlog extends Component {
 		//on any day except today, give the user a dropdown to choose a time of day 
 		if (moment(this.state.date.valueOf()).unix() !== moment(moment().startOf('day').valueOf()).unix()) {
 			let timeOfDaySelected = "Selected Time of Day";
-			if (this.state.timeOfDaySelected && this.state.timeOfDaySelected) {
+			if (this.state.timeOfDaySelected) {
 				timeOfDaySelected = this.state.timeOfDaySelected.name;
 			}
 			timeOfDayDropdown = (
@@ -606,7 +612,7 @@ class WriteBlog extends Component {
 						controlId="stateFormInput"
 						validationState={validateFormString(this.state.state)}
 					>
-						<ControlLabel>State</ControlLabel>
+						<ControlLabel>State/Region</ControlLabel>
 						<FormControl
 							type="text"
 							value={this.state.state}
@@ -665,19 +671,19 @@ class WriteBlog extends Component {
 					</FormGroup>
 				</form>
 
-				{/* insert carousel here */}
+				{/*form where you can dynamically create blog content (paragraphs, bullet list, etc.) */}
+				<BlogEntryFormGenerator
+					refreshProp={this.state.formRefreshProp}
+					getBlogTextData={(data) => { this.storeBlogTextFromChildForm(data)}}
+					/>
+
 				<ImageCarousel
+					refreshProp={this.state.formRefreshProp}
 					imageSelectedCallback={(imgData) => {
 						//NOTE to implementing components: 
 						//formDataCallback can/should be called with data parameter as null if form data is invalid
 						this.storeCarouselImages(imgData)
 					}}
-				/>
-
-				{/*form where you can dynamically create blog content (paragraphs, bullet list, etc.) */}
-				<BlogEntryFormGenerator
-					getBlogTextData={(data) => { this.storeBlogTextFromChildForm(data)}}
-					refreshProp={this.state.formRefreshProp}
 				/>
 
 				{/* submit button with network status indicators */}

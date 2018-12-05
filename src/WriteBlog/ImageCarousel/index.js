@@ -3,7 +3,14 @@ import { Panel, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import './styles.css';
-class ImageCarousel extends React.Component {
+export default class ImageCarousel extends React.Component {
+
+    static propTypes = {
+        //callback image data
+        imageSelectedCallback: PropTypes.func.isRequired,
+        //refresh counter: could be anything just needs to change to refresh
+        refreshProp: PropTypes.any
+    };
 
     constructor(props, context) {
         super(props, context);
@@ -15,6 +22,19 @@ class ImageCarousel extends React.Component {
                 imgMetaData: [] //sister array containing title, description, etc. for images
             }
         };
+    }
+
+    componentDidUpdate(prevProps) {
+        //wipe out our data on refresh update
+        if (this.props.refreshProp !== prevProps.refreshProp) {
+            this.setState({
+                imgPreviewUrls: [],
+                finalImageData: {
+                    imgFiles: [], //array contains the images
+                    imgMetaData: [] //sister array containing title, description, etc. for images
+                }
+            });
+        }
     }
 
     handleImgFilesChange = (e) => {
@@ -123,7 +143,7 @@ class ImageCarousel extends React.Component {
                                     value={this.state.finalImageData.imgMetaData[index].imageTitle}
                                     placeholder="Where you was"
                                     onChange={(event) => {
-                                        let imgDataArr = {...this.state.finalImageData};
+                                        let imgDataArr = { ...this.state.finalImageData };
                                         imgDataArr.imgMetaData[index].imageTitle = event.target.value;
                                         this.setState({ finalImageData: imgDataArr });
                                     }}
@@ -140,7 +160,7 @@ class ImageCarousel extends React.Component {
                                     value={this.state.finalImageData.imgMetaData[index].imageDescription}
                                     placeholder="What happened here?"
                                     onChange={(event) => {
-                                        let imgDataArr = {...this.state.finalImageData};
+                                        let imgDataArr = { ...this.state.finalImageData };
                                         imgDataArr.imgMetaData[index].imageDescription = event.target.value;
                                         this.setState({ finalImageData: imgDataArr });
                                     }}
@@ -183,9 +203,3 @@ class ImageCarousel extends React.Component {
         );
     }
 }
-
-ImageCarousel.propTypes = {
-    imageSelectedCallback: PropTypes.func
-}
-
-export default ImageCarousel;
