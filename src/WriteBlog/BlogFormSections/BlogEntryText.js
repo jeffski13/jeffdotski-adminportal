@@ -7,22 +7,30 @@ import { validateFormString, FORM_SUCCESS } from '../../formvalidation';
 normal paragraph text for the blog.
 Can contain multiple paragraphs
 */
+const BLOG_TEXT_ROWS_DEFAULT = 4;
 class BlogEntryText extends React.Component {
 
     constructor(props, context) {
         super(props, context);
         
         this.state = {
-          blogtext: ''
+          blogtext: '',
+          blogTextRows: BLOG_TEXT_ROWS_DEFAULT
         };
     }
 
     handleBlogTextChange = (e) => {
-        if(e.target.value === ''){
-            this.setState({ blogtext: null });
-        }else{
-            this.setState({ blogtext: e.target.value });
+        let textArr = this.blogTextArea.value.split(/\r*\n/);
+        let rows = BLOG_TEXT_ROWS_DEFAULT;
+        if(textArr.length >= BLOG_TEXT_ROWS_DEFAULT){
+            rows = textArr.length;
         }
+        this.setState({ 
+            blogtext: this.blogTextArea.value,
+            blogTextRows: rows
+        }, () => {
+            this.createBlogTextModel();
+        });
     }
 
     createBlogTextModel = () => {
@@ -65,7 +73,9 @@ class BlogEntryText extends React.Component {
                     value={this.state.blogtext}
                     placeholder="blog text"
                     onChange={this.handleBlogTextChange}
-                    onBlur={this.createBlogTextModel} />
+                    inputRef={ref => { this.blogTextArea = ref; }}
+                    rows={this.state.blogTextRows}
+                    />
             </FormGroup>
         );
     }
