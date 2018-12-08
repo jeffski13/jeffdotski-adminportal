@@ -10,6 +10,7 @@ export default class ResizeImg extends React.Component {
 
     static propTypes = {
         filesToThumbAndUpload: PropTypes.object.isRequired,
+        tripId: PropTypes.string.isRequired,
         onPhotoFinished: PropTypes.func
     };
 
@@ -60,7 +61,7 @@ export default class ResizeImg extends React.Component {
             // The console will warn them of their treachery
             return false;
         }
-
+        
         this.setState({
             thumbnailUrls: [],
             picsToUpload: files.length,
@@ -76,7 +77,7 @@ export default class ResizeImg extends React.Component {
             if (!file.type.match(imageType)) {
                 continue;
             }
-
+            
             let reader = new FileReader();
             if (reader != null) {
                 reader.onload = (event) => {
@@ -84,6 +85,7 @@ export default class ResizeImg extends React.Component {
                     var img = new Image();
                     img.src = event.target.result;
                     // need reference to parentreactComponent because we cant bind this (need this of the img.onload to get height and width)
+                    let tripId = this.props.tripId;
                     var parentReactComponent = this;
                     img.onload = function () {
             
@@ -104,7 +106,7 @@ export default class ResizeImg extends React.Component {
             
                             resizedCanvas.toBlob((createdBlog) => {
                                 //upload the file
-                                uploadPhotoThumbnail(createdBlog, 'Jeffski2025thumb', (err, data) => {
+                                uploadPhotoThumbnail(createdBlog, tripId, (err, data) => {
                                     //error handling
                                     if (err) {
                                         parentReactComponent.props.onPhotoFinished({

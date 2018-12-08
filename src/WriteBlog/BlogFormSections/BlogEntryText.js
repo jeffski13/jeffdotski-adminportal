@@ -20,11 +20,14 @@ class BlogEntryText extends React.Component {
     }
 
     handleBlogTextChange = (e) => {
+        //resize text area with the amount of rows user entered
         let textArr = this.blogTextArea.value.split(/\r*\n/);
         let rows = BLOG_TEXT_ROWS_DEFAULT;
         if(textArr.length >= BLOG_TEXT_ROWS_DEFAULT){
             rows = textArr.length;
         }
+
+        //store the text user entered and 
         this.setState({ 
             blogtext: this.blogTextArea.value,
             blogTextRows: rows
