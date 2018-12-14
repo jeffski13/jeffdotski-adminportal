@@ -9,20 +9,24 @@ import { STATUS_LOADING, STATUS_FAILURE, STATUS_SUCCESS } from '../../aws/networ
 export default class ResizeImg extends React.Component {
 
     static propTypes = {
-        filesToThumbAndUpload: PropTypes.object.isRequired,
+        filesToResizeAndUpload: PropTypes.array.isRequired,
         tripId: PropTypes.string.isRequired,
+        resizeHeight: PropTypes.number, //the height
+        subfolderName: PropTypes.string,
         onPhotoFinished: PropTypes.func
     };
 
     //default to empty functions to avoid crash
     static defaultProps = {
-        // uploadedThumbnailData will be an array with these objects:
+        // the onPhotoFinished() resizedImageData param will be an array with these objects:
         // {
         //   filename: string, 
         //   url: string, 
         //   index: number
         // }
-        onPhotoFinished: (err, uploadedThumbnailData) => { }
+        onPhotoFinished: (err, resizedImageData) => { },
+        resizeHeight: 250,
+        subfolderName: 'default'
     };
 
     constructor(props) {
@@ -48,14 +52,14 @@ export default class ResizeImg extends React.Component {
     }
     
     shouldComponentUpdate(nextProps, nextState){
-        if(this.props.filesToThumbAndUpload !== nextProps.filesToThumbAndUpload){
+        if(this.props.filesToResizeAndUpload !== nextProps.filesToResizeAndUpload){
             this.createThumnailAndUpload();
         }
     }
 
     createThumnailAndUpload = () => {
 
-        let files = this.props.filesToThumbAndUpload;
+        let files = this.props.filesToResizeAndUpload;
         if (files == null || files == undefined || files.length === 0) {
             // fail here as they didnt give files we needed.
             // The console will warn them of their treachery
@@ -70,7 +74,7 @@ export default class ResizeImg extends React.Component {
             thumbnailNetworkStatus: STATUS_LOADING
         });
 
-        for (var i = 0; i < files.length; i++) {
+        for (let i = 0; i < files.length; i++) {
             let file = files[i];
             let fileIndex = i;
             let imageType = /image.*/;
@@ -81,32 +85,34 @@ export default class ResizeImg extends React.Component {
             let reader = new FileReader();
             if (reader != null) {
                 reader.onload = (event) => {
-                    var resizedCanvas = document.createElement('canvas');
-                    var img = new Image();
+                    let resizeHeight = this.props.resizeHeight;
+                    let subfolderName = this.props.subfolderName;
+
+                    let resizedCanvas = document.createElement('canvas');
+                    let img = new Image();
                     img.src = event.target.result;
                     // need reference to parentreactComponent because we cant bind this (need this of the img.onload to get height and width)
                     let tripId = this.props.tripId;
-                    var parentReactComponent = this;
+                    let parentReactComponent = this;
                     img.onload = function () {
             
                         resizedCanvas.id = "myTempCanvas";
-                        var fixHeight = 250;
-                        var ratioedWidth = Math.floor((this.width * fixHeight) / this.height);
+                        let ratioedWidth = Math.floor((this.width * resizeHeight) / this.height);
                         resizedCanvas.width = Number(ratioedWidth);
-                        resizedCanvas.height = Number(fixHeight);
+                        resizedCanvas.height = Number(resizeHeight);
             
                         if (resizedCanvas.getContext) {
-                            var cntxt = resizedCanvas.getContext("2d");
+                            let cntxt = resizedCanvas.getContext("2d");
                             cntxt.drawImage(img, 0, 0, resizedCanvas.width, resizedCanvas.height);
-                            var dataURL = resizedCanvas.toDataURL();
-                            var resizedImgToUpload = {
+                            let dataURL = resizedCanvas.toDataURL();
+                            let resizedImgToUpload = {
                                 name: "filenameski",
                                 src: dataURL
                             }
             
                             resizedCanvas.toBlob((createdBlog) => {
                                 //upload the file
-                                uploadPhotoThumbnail(createdBlog, tripId, (err, data) => {
+                                uploadPhotoThumbnail(createdBlog, subfolderName, tripId, (err, data) => {
                                     //error handling
                                     if (err) {
                                         parentReactComponent.props.onPhotoFinished({
@@ -166,7 +172,7 @@ export default class ResizeImg extends React.Component {
             }
             uploadProgress = (
                 <span>
-                    Working On It: ({this.state.picsSuccessful} of {this.state.picsToUpload})
+                    Uploading {this.props.subfolderName} photos: ({this.state.picsSuccessful} of {this.state.picsToUpload})
                     {picsFailedReadout}
                 </span>
             );

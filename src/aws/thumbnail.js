@@ -4,10 +4,20 @@ import uuidv1 from 'uuid/v1';
 import { AWS_S3_BUCKET_NAME } from '../configski';
 import { AWS_S3_REGION, AWS_IDENTITY_POOL_ID_AWS_ACCESS } from '../configski';
 
-export function uploadPhotoThumbnail(file, tripId, callback) {
+export function uploadPhotoThumbnail(file, subfolderName, tripId, callback) {
     // cant do stuff without a file
-    if(!file || !tripId || tripId === ''){
-        callback({ message: "No file or tripid while trying to upload photo!"});
+    console.log('jeffski uploading file ', file);
+    
+    if(!file){
+        callback({ message: "No file while trying to upload photo!"});
+        return;
+    }
+    if(!tripId || tripId === ''){
+        callback({ message: "No tripid while trying to upload photo!"});
+        return;
+    }
+    if(!subfolderName || subfolderName === ''){
+        callback({ message: "No subfolderName while trying to upload photo!"});
         return;
     }
 
@@ -15,7 +25,7 @@ export function uploadPhotoThumbnail(file, tripId, callback) {
     if(file.name){
         fileName += file.name;
     }
-    let blogImageUploadKey = `blog/${tripId}/thumb/${fileName}.png`;
+    let blogImageUploadKey = `blog/${tripId}/${subfolderName}/${fileName}.png`;
 
     AWS.config.update({
         region: AWS_S3_REGION,

@@ -92,6 +92,7 @@ class WriteBlog extends Component {
             blogImagesUrls: [],
             blogImagesStatusArr: [],
             blogImagesThumbnailStatusArr: [],
+            blogImagesMidSizeStatusArr: [],
             titleImgNetworkStatus: null, //status for both blog photos and title photo
             blogStatus: null, //status for blog data
             networkStatusErrorMesage: '',
@@ -175,12 +176,14 @@ class WriteBlog extends Component {
         //initialize variables for loading progress
         let initializedBlogImagesUploadStatusArr = [];
         let initializedBlogImagesThumbnailUploadStatusArr = [];
+        let initializedBlogImagesMidSizedUploadStatusArr = [];
         let initializedBlogImageUrls = [];
 
         if (this.state.blogImages.imgFiles !== undefined) {
             for (let i = 0; i < this.state.blogImages.imgFiles.length; i++) {
                 initializedBlogImagesUploadStatusArr.push(STATUS_LOADING);
                 initializedBlogImagesThumbnailUploadStatusArr.push(STATUS_LOADING);
+                initializedBlogImagesMidSizedUploadStatusArr.push(STATUS_LOADING);
                 initializedBlogImageUrls.push({
                     url: '',
                     thumbnailUrl: '',
@@ -197,6 +200,7 @@ class WriteBlog extends Component {
         this.setState({
             blogImagesStatusArr: initializedBlogImagesUploadStatusArr,
             blogImagesThumbnailStatusArr: initializedBlogImagesThumbnailUploadStatusArr,
+            blogImagesMidSizeStatusArr: initializedBlogImagesMidSizedUploadStatusArr,
             blogImagesUrls: initializedBlogImageUrls
         }, () => {
             //upload all blog images
@@ -244,7 +248,7 @@ class WriteBlog extends Component {
         let thumbnailStatusArr = this.state.blogImagesThumbnailStatusArr;
         let index = -1;
         if (errData) {
-            console.log("error uploading ", errData.filename, " with error ", errData.error);
+            console.log("error uploading thumbnail ", errData.filename, " with error ", errData.error);
             index = errData.index;
             thumbnailStatusArr[index] = STATUS_FAILURE;
             this.setState({
@@ -268,15 +272,51 @@ class WriteBlog extends Component {
         }
     };
 
+    onMidsizedImageUploadComplete = (errData, resizedImageData) => {
+        let midsizePhotoStatusArr = this.state.blogImagesMidSizeStatusArr;
+        let index = -1;
+        if (errData) {
+            console.log("error uploading midsize photo ", errData.filename, " with error ", errData.error);
+            index = errData.index;
+            midsizePhotoStatusArr[index] = STATUS_FAILURE;
+            this.setState({
+                blogImagesMidSizeStatusArr: midsizePhotoStatusArr
+            }, () => {
+                this.onBlogOrThumbnailImageUploaded();
+            });
+            return;
+        }
+        else {
+            let index = resizedImageData.index;
+            let blogImagesDataArr = this.state.blogImagesUrls;
+            midsizePhotoStatusArr[index] = STATUS_SUCCESS;
+            blogImagesDataArr[index].midsize = resizedImageData.url;
+            this.setState({
+                blogImagesMidSizeStatusArr: midsizePhotoStatusArr,
+                blogImagesUrls: blogImagesDataArr
+            }, () => {
+                this.onBlogOrThumbnailImageUploaded();
+            });
+        }
+    };
+
     onBlogOrThumbnailImageUploaded = () => {
-        //check that we are completely done
+        //check that we are completely done with thumbnail images
         let allBlogImagesAndThumbsSuccess = true;
         this.state.blogImagesThumbnailStatusArr.forEach(function (nextStatus) {
             if (nextStatus !== STATUS_SUCCESS) {
                 allBlogImagesAndThumbsSuccess = false;
             }
         });
-
+        
+        //check that we are completely done with midsized images
+        this.state.blogImagesMidSizeStatusArr.forEach(function (nextStatus) {
+            if (nextStatus !== STATUS_SUCCESS) {
+                allBlogImagesAndThumbsSuccess = false;
+            }
+        });
+        
+        //check that we are completely done with OG full size images
         this.state.blogImagesStatusArr.forEach(function (nextStatus) {
             if (nextStatus !== STATUS_SUCCESS) {
                 allBlogImagesAndThumbsSuccess = false;
@@ -662,9 +702,19 @@ class WriteBlog extends Component {
                         {this.renderBlogUploadStatusMessage()}
                     </div>
                     {this.state.blogImages.imgFiles && this.state.blogImagesThumbnailStatusArr.includes(STATUS_LOADING) &&
-                        <ResizeImg filesToThumbAndUpload={this.state.blogImages.imgFiles}
+                        <ResizeImg filesToResizeAndUpload={this.state.blogImages.imgFiles}
                             tripId={this.state.tripId}
                             onPhotoFinished={this.onThumbnailUploadComplete}
+                            resizeHeight={250}
+                            subfolderName="thumbnails"
+                        />
+                    }
+                    {this.state.blogImages.imgFiles && !this.state.blogImagesThumbnailStatusArr.includes(STATUS_LOADING) && this.state.blogImagesMidSizeStatusArr.includes(STATUS_LOADING) &&
+                        <ResizeImg filesToResizeAndUpload={this.state.blogImages.imgFiles}
+                            tripId={this.state.tripId}
+                            onPhotoFinished={this.onMidsizedImageUploadComplete}
+                            resizeHeight={1000}
+                            subfolderName="midsize"
                         />
                     }
                     {this.state.titleImage && this.state.titleImgNetworkStatus === STATUS_LOADING &&
