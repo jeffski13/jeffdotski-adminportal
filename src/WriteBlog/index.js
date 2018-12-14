@@ -290,7 +290,7 @@ class WriteBlog extends Component {
             let index = resizedImageData.index;
             let blogImagesDataArr = this.state.blogImagesUrls;
             midsizePhotoStatusArr[index] = STATUS_SUCCESS;
-            blogImagesDataArr[index].midsize = resizedImageData.url;
+            blogImagesDataArr[index].midsizeUrl = resizedImageData.url;
             this.setState({
                 blogImagesMidSizeStatusArr: midsizePhotoStatusArr,
                 blogImagesUrls: blogImagesDataArr
