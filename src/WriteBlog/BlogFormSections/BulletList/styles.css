@@ -4,3 +4,26 @@
 	justify-content: center;
 	height: 30px;
 }
+
+.bulletListInputs {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.formSubtextInput {
+    border: #bbb;
+    border-style: none none solid none;
+    margin-bottom: 10px;
+}
+
+.BulletTextItem_formTextInput {
+    font-weight: normal;
+}
+
+.BulletTextItem_formSubtextInput {
+    font-weight: normal;
+}
+
+.BulletListItem_toBeDeleted {
+    background: #ffafaf;
+}

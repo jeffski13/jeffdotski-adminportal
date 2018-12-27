@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FormGroup, ControlLabel, FormControl, ButtonToolbar, Button, DropdownButton, MenuItem } from 'react-bootstrap';
+import { FormGroup, ControlLabel, FormControl, ButtonToolbar, Button, DropdownButton, MenuItem, Panel } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CircularProgress from 'material-ui/Progress/CircularProgress';
@@ -147,7 +147,7 @@ class WriteBlog extends Component {
     handleLocationChange = (e) => {
         this.setState({ location: e.target.value });
     }
-    
+
     //upload photo/blog to server
     onUploadBlogClicked = () => {
         //when we are done initializing state for upload, well...start the upload!
@@ -308,14 +308,14 @@ class WriteBlog extends Component {
                 allBlogImagesAndThumbsSuccess = false;
             }
         });
-        
+
         //check that we are completely done with midsized images
         this.state.blogImagesMidSizeStatusArr.forEach(function (nextStatus) {
             if (nextStatus !== STATUS_SUCCESS) {
                 allBlogImagesAndThumbsSuccess = false;
             }
         });
-        
+
         //check that we are completely done with OG full size images
         this.state.blogImagesStatusArr.forEach(function (nextStatus) {
             if (nextStatus !== STATUS_SUCCESS) {
@@ -542,6 +542,7 @@ class WriteBlog extends Component {
     };
 
     render() {
+
         let timeOfDayDropdown = null;
         //on any day except today, give the user a dropdown to choose a time of day 
         if (moment(this.state.date.valueOf()).unix() !== moment(moment().startOf('day').valueOf()).unix()) {
@@ -564,6 +565,12 @@ class WriteBlog extends Component {
         }
         else {
             window.removeEventListener('beforeunload', this.handleUserLeavingBlogForm);
+        }
+
+        //show validation of blog content area (text, bullets, etc)
+        let blogValidationBootstrapState = 'danger';
+        if(this.state.blogtext && this.state.blogtext.length > 0){
+            blogValidationBootstrapState = 'success';
         }
 
         return (
@@ -667,20 +674,26 @@ class WriteBlog extends Component {
 
                 </form>
 
-                {/*form where you can dynamically create blog content (paragraphs, bullet list, etc.) */}
-                <BlogEntryFormGenerator
-                    refreshProp={this.state.formRefreshProp}
-                    getBlogTextData={(data) => { this.storeBlogTextFromChildForm(data) }}
-                />
 
-                <ImageCarousel
-                    refreshProp={this.state.formRefreshProp}
-                    imageSelectedCallback={(imgData) => {
-                        //NOTE to implementing components: 
-                        //formDataCallback can/should be called with data parameter as null if form data is invalid
-                        this.storeCarouselImages(imgData)
-                    }}
-                />
+                <Panel bsStyle={blogValidationBootstrapState} >
+                    <Panel.Body>
+                        {/*form where you can dynamically create blog content (paragraphs, bullet list, etc.) */}
+                        <BlogEntryFormGenerator
+                            refreshProp={this.state.formRefreshProp}
+                            getBlogTextData={(data) => { this.storeBlogTextFromChildForm(data) }}
+                        />
+
+                        <ImageCarousel
+                            refreshProp={this.state.formRefreshProp}
+                            imageSelectedCallback={(imgData) => {
+                                //NOTE to implementing components: 
+                                //formDataCallback can/should be called with data parameter as null if form data is invalid
+                                this.storeCarouselImages(imgData)
+                            }}
+                        />
+
+                    </Panel.Body>
+                </Panel>
 
                 {/* submit button with network status indicators */}
                 <ButtonToolbar>

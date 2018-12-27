@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Col, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import { Col, FormGroup, ControlLabel, FormControl, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import Button from 'material-ui/Button';
 
 import BulletListTextItem from './BulletListTextItem';
 import './styles.css';
@@ -13,158 +12,154 @@ Consists of some header text and a list of bullet items.
 NOTE: header text is optional
 */
 class BulletList extends Component {
-	constructor(props, context) {
-		super(props, context);
+    constructor(props, context) {
+        super(props, context);
 
-		//initial state with one bulletlist item
-		this.state = {
-			headertext: undefined,
-			bulletListItems: [
-				{
+        //initial state with one bulletlist item
+        this.state = {
+            headertext: undefined,
+            bulletListItems: [
+                {
                     bulletData: null,
                     id: 'firstBulletItemUniqueID'
-				}
-			]
-		};
-	}
+                }
+            ]
+        };
+    }
 
-	handleTextChange = (e) => {
-		if (e.target.value === '') {
-			this.setState({ headertext: undefined });
-		}
-		else {
-			this.setState({ headertext: e.target.value });
-		}
-	}
+    handleTextChange = (e) => {
+        if (e.target.value === '') {
+            this.setState({ headertext: undefined });
+        }
+        else {
+            this.setState({ headertext: e.target.value });
+        }
+    }
 
-	returnBlogBulletListModel = () => {
-		//create an array of valid bullets
-		let validBullets = [];
-		this.state.bulletListItems.forEach(element => {
-			if (element.bulletData !== null) {
-				validBullets.push(element.bulletData)
-			}
-		});
-		
-		//check for valid form state
-		//if there are no bullets, the form is invalid
-		if(validBullets.length === 0){
-			this.props.formDataCallback(null);
-			return; 
-		}
+    returnBlogBulletListModel = () => {
+        //create an array of valid bullets
+        let validBullets = [];
+        this.state.bulletListItems.forEach(element => {
+            if (element.bulletData !== null) {
+                validBullets.push(element.bulletData)
+            }
+        });
 
-		//create model for bullet list data
-		let bulletListDataModel = {
-			text: this.state.headertext,
-			list: {
-				style: 'bullet',
-				textItems: validBullets
-			}
-		};
+        //check for valid form state
+        //if there are no bullets, the form is invalid
+        if (validBullets.length === 0) {
+            this.props.formDataCallback(null);
+            return;
+        }
 
-		//hand data up to callback
-		this.props.formDataCallback(bulletListDataModel);
-	}
+        //create model for bullet list data
+        let bulletListDataModel = {
+            text: this.state.headertext,
+            list: {
+                style: 'bullet',
+                textItems: validBullets
+            }
+        };
 
-	//add a bullet point to the state arr (this will cause another bullet list item to render)
-	addBulletListItem = () => {
-		let newBulletArr = [...this.state.bulletListItems];
+        //hand data up to callback
+        this.props.formDataCallback(bulletListDataModel);
+    }
 
-		//Add new bullet item to state list with unique ID 
-		let uniqueId = 'bulletItemID' + Date.now();
-		let nextBulletItem = {
-			bulletData: null,
-			id: uniqueId
-		};
+    //add a bullet point to the state arr (this will cause another bullet list item to render)
+    addBulletListItem = () => {
+        let newBulletArr = [...this.state.bulletListItems];
 
-		newBulletArr.push(nextBulletItem);
-		//save to state
-		this.setState({ bulletListItems: newBulletArr });
-	}
+        //Add new bullet item to state list with unique ID 
+        let uniqueId = 'bulletItemID' + Date.now();
+        let nextBulletItem = {
+            bulletData: null,
+            id: uniqueId
+        };
 
-	removeBulletListItem = (index) => {
-		let newBulletArr = [...this.state.bulletListItems];
-		newBulletArr.splice(index, 1);
+        newBulletArr.push(nextBulletItem);
+        //save to state
+        this.setState({ bulletListItems: newBulletArr });
+    }
 
-		//save to state
-		this.setState({ bulletListItems: newBulletArr },
-			//on state update complete, hand info up to the callback
-			() => {
-				this.returnBlogBulletListModel();
-			}
-		);
-	}
+    removeBulletListItem = (index) => {
+        let newBulletArr = [...this.state.bulletListItems];
+        newBulletArr.splice(index, 1);
 
-	//data might be null - keep that ish in mind
-	onBulletListItemDataUpdated = (index, data) => {
-		let newBulletArr = [...this.state.bulletListItems];
-		newBulletArr[index].bulletData = data;
-		//save to state
-		this.setState({ bulletListItems: newBulletArr },
-			//on state update complete, hand info up to the callback
-			() => {
-				this.returnBlogBulletListModel();
-			}
-		);
-	}
+        //save to state
+        this.setState({ bulletListItems: newBulletArr },
+            //on state update complete, hand info up to the callback
+            () => {
+                this.returnBlogBulletListModel();
+            }
+        );
+    }
 
-	//render a bullet list item component for each item in the state arr
-	renderBulletListItems = (bulletListItem, index) => {
-		return (
-			<BulletListTextItem
-				key={bulletListItem.id}
-				onDeleteBulletCallback={
-					() => { this.removeBulletListItem(index); }
-				}
-				onDataUpdatedCallback={
-					//note that method will be called with null data if list item was invalid
-					(data) => { this.onBulletListItemDataUpdated(index, data) }
-				}
-			/>
-		);
-	}
+    //data might be null - keep that ish in mind
+    onBulletListItemDataUpdated = (index, data) => {
+        let newBulletArr = [...this.state.bulletListItems];
+        newBulletArr[index].bulletData = data;
+        //save to state
+        this.setState({ bulletListItems: newBulletArr },
+            //on state update complete, hand info up to the callback
+            () => {
+                this.returnBlogBulletListModel();
+            }
+        );
+    }
 
-	//shows the header text entry form and the bullet list items.
-	//Bullet list items can be added and removed
-	render() {
+    //render a bullet list item component for each item in the state arr
+    renderBulletListItems = (bulletListItem, index) => {
+        return (
+            <BulletListTextItem
+                key={bulletListItem.id}
+                onDeleteBulletCallback={
+                    () => { this.removeBulletListItem(index); }
+                }
+                onDataUpdatedCallback={
+                    //note that method will be called with null data if list item was invalid
+                    (data) => { this.onBulletListItemDataUpdated(index, data) }
+                }
+            />
+        );
+    }
 
-		return (
-			<div>
-				<form>
-					<Col xs={12} >
-						<FormGroup
-							className="formInputSection"
-						>
-							<ControlLabel className="formInputLabel" >Bullet Section Text (Optional)</ControlLabel>
-							<FormControl
-								type="text"
-								value={this.state.headertext}
-								placeholder="Enter Text"
-								onChange={this.handleTextChange}
-								onBlur={this.returnBlogBulletListModel}
-							/>
-						</FormGroup>
-					</Col>
-				</form>
-				{this.state.bulletListItems.map(this.renderBulletListItems)}
-				<Col xs={12} >
+    //shows the header text entry form and the bullet list items.
+    //Bullet list items can be added and removed
+    render() {
 
-					<Button
-						onClick={this.addBulletListItem}
-						variant="raised"
-					>
-						Add Bullet
-          </Button>
-				</Col>
-			</div>
+        return (
+            <div>
+                <form>
+                    <Col xs={12} >
+                        <FormGroup
+                            className="formInputSection"
+                        >
+                            <ControlLabel className="formInputLabel" >Bullet Section Text (Optional)</ControlLabel>
+                            <FormControl
+                                type="text"
+                                value={this.state.headertext}
+                                placeholder="Enter Text"
+                                onChange={this.handleTextChange}
+                                onBlur={this.returnBlogBulletListModel}
+                            />
+                        </FormGroup>
+                    </Col>
+                </form>
+                {this.state.bulletListItems.map(this.renderBulletListItems)}
+                <Col xs={12} >
+                    <Button onClick={this.addBulletListItem} >
+                        Add Bullet
+                    </Button>
+                </Col>
+            </div>
 
-		);
-	}
+        );
+    }
 }
 
 
 BulletList.propTypes = {
-	formDataCallback: PropTypes.func //will be called with null if form data is invalid
+    formDataCallback: PropTypes.func //will be called with null if form data is invalid
 }
 
 export default BulletList;

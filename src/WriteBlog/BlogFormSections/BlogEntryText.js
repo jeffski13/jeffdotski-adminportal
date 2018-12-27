@@ -72,9 +72,9 @@ class BlogEntryText extends React.Component {
             >
                 <ControlLabel>What Happened Today?</ControlLabel>
                 <FormControl
-                    componentClass="textarea" 
+                    componentClass="textarea"
                     value={this.state.blogtext}
-                    placeholder="blog text"
+                    placeholder="<Your Adventure Here>"
                     onChange={this.handleBlogTextChange}
                     inputRef={ref => { this.blogTextArea = ref; }}
                     rows={this.state.blogTextRows}
