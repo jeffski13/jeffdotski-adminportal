@@ -52,6 +52,14 @@ class BulletListTextItem extends Component {
         this.props.onDeleteBulletCallback();
     }
 
+    setBulletPendingDelete = () => {
+        this.setState({ isDeletHovered: true });
+    }
+
+    setBulletNOTPendingDelete = () => {
+        this.setState({ isDeletHovered: false });
+    }
+
     //get current information in this component and that info back to callback
     returnBlogBulletListModelData = () => {
         //if title, text, and subtext are all null, form is invalid
@@ -86,12 +94,8 @@ class BulletListTextItem extends Component {
                     <Button
                         onClick={this.onDeleteBulletButtonClicked}
                         bsStyle="danger" bsSize="xs"
-                        onMouseEnter={() => {
-                            this.setState({ isDeletHovered: true });
-                        }}
-                        onMouseLeave={() => {
-                            this.setState({ isDeletHovered: false });
-                        }}
+                        onMouseEnter={this.setBulletPendingDelete} onMouseLeave={this.setBulletNOTPendingDelete}
+                        onFocus={this.setBulletPendingDelete} onBlur={this.setBulletNOTPendingDelete}
                     >
                         <Glyphicon glyph="remove" />
                     </Button>
@@ -138,12 +142,8 @@ class BulletListTextItem extends Component {
                     <Button
                         onClick={this.onDeleteBulletButtonClicked}
                         bsStyle="danger" bsSize="xs"
-                        onMouseEnter={() => {
-                            this.setState({ isDeletHovered: true });
-                        }}
-                        onMouseLeave={() => {
-                            this.setState({ isDeletHovered: false });
-                        }}
+                        onMouseEnter={this.setBulletPendingDelete} onMouseLeave={this.setBulletNOTPendingDelete}
+                        onFocus={this.setBulletPendingDelete} onBlur={this.setBulletNOTPendingDelete}
                     >
                         <Glyphicon glyph="remove" />
                     </Button>

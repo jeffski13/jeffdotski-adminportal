@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from 'material-ui/Button';
+import {Button} from 'react-bootstrap';
 
 import BlogFormSections from './BlogFormSections';
 import BlogEntryText from './BlogFormSections/BlogEntryText';
@@ -152,15 +152,11 @@ export default class BlogEntryFormGenerator extends React.Component {
 
     //renders the button for the blog toolbox. These buttons when clicked will allow the user to add different blog sections
     createBlogToolboxButton = (buttonInfo, index) => {
-        let addSectionButtonStyle = {
-            padding: "5px",
-            margin: "5px"
-        }
+        
         return (
             <Button
                 key={index}
-                style={addSectionButtonStyle}
-                variant="raised"
+                className='BlogEntryFormGenerator_addButton'
                 onClick={() => this.onAddBlogSectionButtonClicked(index)}
             >
                 {buttonInfo.label}
@@ -183,7 +179,7 @@ export default class BlogEntryFormGenerator extends React.Component {
             <div>
                 {this.state.blogSectionsOnscreen.map(this.renderBlogSection)}
                 <div className="addSectionButtonsContainer">
-                    {this.state.blogSectionsToolbox.map(this.createBlogToolboxButton)}
+                    <strong>Add More: </strong>{this.state.blogSectionsToolbox.map(this.createBlogToolboxButton)}
                 </div>
             </div>
         );
