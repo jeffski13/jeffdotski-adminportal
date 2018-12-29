@@ -6,7 +6,7 @@ import moment from 'moment';
 import Indicator from '../aws/Indicator';
 import { validateFormString, validateFormPositiveNumber, FORM_SUCCESS } from '../formvalidation';
 import { STATUS_LOADING, STATUS_FAILURE, STATUS_SUCCESS } from '../aws/networkConsts';
-import { createTrip } from '../aws/trips';
+import { createTrip, updateTrip } from '../aws/trips';
 import TripsDropdown from './TripsDropdown';
 import TripForm from './TripForm';
 import './styles.css';
@@ -61,44 +61,42 @@ export default class Trips extends React.Component {
             submitTripStatus: STATUS_LOADING,
             createTripResults: {}
         }, () => {
-            //send request with new blog entry
-            if(this.state.tripMode === TRIP_MODE_CREATE_NEW){
-                createTrip(this.state.tripInfo, (err, data) => {
-                    if (err) {
-                        this.setState({
-                            submitTripStatus: STATUS_FAILURE,
-                            createTripResults: {
-                                status: err.status,
-                                message: err.data.message,
-                                code: err.data.code
-                            }
-                        });
-                        return;
-                    }
-                    //declare victory! and clear out trip creation stuff
-                    //refresh trips
-                    this.childTripsDropdown.getTrips();
+
+            let tripFunctionCallback = (err, data) => {
+                if (err) {
                     this.setState({
-                        submitTripStatus: STATUS_SUCCESS,
-                        tripInfo: {
-                            location: '',
-                            name: '',
-                            year: moment().year(),
-                            month: moment().month() + 1
-                        },
+                        submitTripStatus: STATUS_FAILURE,
                         createTripResults: {
-                            message: 'Trip created!'
+                            status: err.status,
+                            message: err.data.message,
+                            code: err.data.code
                         }
                     });
+                    return;
+                }
+                //declare victory! and clear out trip creation stuff
+                //refresh trips
+                this.resetTripForm();
+                this.setState({
+                    submitTripStatus: STATUS_SUCCESS,
+                    createTripResults: {
+                        message: 'Trip Submitted!'
+                    }
                 });
             }
+
+
+            //send request with new blog entry
+            if(this.state.tripMode === TRIP_MODE_CREATE_NEW){
+                createTrip(this.state.tripInfo, tripFunctionCallback);
+            }
             else if(this.state.tripMode === TRIP_MODE_EDIT_EXISTING){
-                console.log('jeffski updating trip with id : ', this.state.tripInfo.id);
+                updateTrip(this.state.tripInfo, tripFunctionCallback);
             }
         });
     }
 
-    onCreatTripClicked = () => {
+    resetTripForm = () => {
         this.setState({
             tripMode: TRIP_MODE_CREATE_NEW,
             tripInfo: {
@@ -132,7 +130,7 @@ export default class Trips extends React.Component {
         if (this.state.createTripResults && this.state.createTripResults.message) {
             tripCreationServerMessage = (
                 <div className="tripServerResults" >
-                    <h4>Trip Create Results</h4>
+                    <h4>Trip Submission Results</h4>
                     <div className="tripServerResultsText" >
                         <div><strong>Message: </strong>{this.state.createTripResults.message}</div>
                         {this.state.createTripResults.code && <div><strong>Code: </strong>{this.state.createTripResults.code}</div>}
@@ -147,13 +145,14 @@ export default class Trips extends React.Component {
             currentActionMessage = `Editing Trip "${this.state.tripInfo.name}"`;
         }
         return (
-
+            
             <div className="Trips">
                 <Button
+                    disabled={this.state.tripMode === TRIP_MODE_CREATE_NEW}
                     className="Trips_tripButton"
                     bsStyle="success"
-                    onClick={this.onCreatTripClicked}
-                >Create Trip</Button>
+                    onClick={this.resetTripForm}
+                >New Trip</Button>
                 <TripsDropdown
                     className="Trips_tripButton"
                     refreshProp={this.state.refreshTrips}
