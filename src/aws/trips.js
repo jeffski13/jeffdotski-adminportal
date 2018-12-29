@@ -68,3 +68,23 @@ export function createTrip(newTripInfo, callback){
     });
 }
 
+export function updateTrip(updatedTripInfo, callback){
+    axios({
+        method: 'put',
+        url: `https://ctbw9plo6d.execute-api.us-east-2.amazonaws.com/Prod/trip`,
+        headers: { 'X-Api-Key': AWS_API_KEY_AWS_ACCESS },
+        data: updatedTripInfo
+    })
+    .then((response) => {
+        //parse the response
+        let rawTripResponse = response.data;
+
+        callback(null, rawTripResponse);
+    })
+    .catch(function (error) {
+        if(error.response){
+            return callback(error.response);
+        }
+        return callback(defaultErrorResponse);
+    });
+}

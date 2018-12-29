@@ -1,8 +1,7 @@
 
 
-.Trips > .TripsDropdown {
+.TripsDropdown {
     padding-bottom: 35px;
-    border-bottom: 1px solid;
 }
 
 .existingTrips > .tripInformation {

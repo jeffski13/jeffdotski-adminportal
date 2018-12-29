@@ -17,7 +17,7 @@ export default class TripsDropdown extends React.Component {
         // if false, will sort by date
         sortAlphabetically: PropTypes.bool,
         //refresh counter: could be anything just needs to change to refresh
-        refreshProp: PropTypes.number
+        refreshProp: PropTypes.any
     };
 
     //default onTripsReturned to empty function to avoid crash
@@ -158,7 +158,7 @@ export default class TripsDropdown extends React.Component {
     }
 
     render() {
-        let tripDropdownValue = "Selected Trip";
+        let tripDropdownValue = "Select A Trip";
         if (this.state.tripIndexSelected > -1 && this.state.availableTrips.length > 0) {
             tripDropdownValue = this.state.availableTrips[this.state.tripIndexSelected].name;
         }
@@ -178,10 +178,11 @@ export default class TripsDropdown extends React.Component {
         }
 
         return (
-            <div className="TripsDropdown">
+            <div className={`TripsDropdown ${this.props.className}`}>
                 <div>
                     <ButtonToolbar>
                         <DropdownButton
+                            id="tripSelectDropdown"
                             title={tripDropdownValue}
                             disabled={this.state.getTripsStatus === STATUS_LOADING}
                         >
